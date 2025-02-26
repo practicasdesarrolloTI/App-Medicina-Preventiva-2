@@ -10,24 +10,14 @@ type Props = {
   onEdit: () => void;
 };
 
-const SurveyCard: React.FC<Props> = ({ survey, onPress, onEdit }) => {
+const SurveyCard: React.FC<Props> = ({ survey, onPress }) => {
   return (
     <View style={styles.card}>
       <Text style={styles.text}><FontAwesome5 name="clipboard-list" size={16} /> {survey.nombre}</Text>
       <Text style={styles.description}>{survey.descripcion}</Text>
-      
-      <View style={styles.cardButtons}>
-        <TouchableOpacity style={styles.startButton} onPress={onPress}>
-          <Text style={styles.buttonText}>Iniciar</Text>
-        </TouchableOpacity>
-
-        {/* 📌 Solo encuestas creadas pueden editarse */}
-        {survey.id.startsWith('custom-') && (
-          <TouchableOpacity style={styles.editButton} onPress={onEdit}>
-            <FontAwesome5 name="edit" size={16} color="white" />
-          </TouchableOpacity>
-        )}
-      </View>
+      <TouchableOpacity style={styles.startButton} onPress={onPress}>
+        <Text style={styles.buttonText}>Iniciar</Text>
+      </TouchableOpacity>
     </View>
   );
 };
