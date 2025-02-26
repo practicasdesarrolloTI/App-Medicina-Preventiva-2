@@ -49,15 +49,11 @@ const AppointmentScreen: React.FC<Props> = ({ navigation }) => {
   return (
     <View style={styles.container}>
         <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.closeButton}>
-          {/* <MaterialIcons name="close" size={24} color={Colors.preto} /> */}
-          <FontAwesome5 name="arrow-left" size={24} color={Colors.preto} />
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <MaterialIcons name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
         <Image source={require('../../assets/icons8-calendario.gif')} style={styles.imageSize} />
       </View>
-        {/* <View style={styles.containerImage}>
-        <Image source={require('../../assets/icons8-calendario.gif')} style={styles.imageSize} />
-        </View> */}
       <Text style={styles.title}>Tus Citas</Text>
       <FlatList
         data={citas}

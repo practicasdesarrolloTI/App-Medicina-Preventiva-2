@@ -22,33 +22,29 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         <View style={styles.container}>
             <Text style={styles.title}>Bienvenido a Bienestar IPS</Text>
             <Text style={styles.subtitle}>Gestión de salud y prevención</Text>
+
+            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Inicio')}>
+                <Text style={styles.buttonText}>Inicio</Text>
+            </TouchableOpacity>
             
             <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('TusCitas')}>
                 <Text style={styles.buttonText}>Ver Mis Citas</Text>
             </TouchableOpacity>
+
             <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('TusProgramas')}>
                 <Text style={styles.buttonText}>Ver Mis Programas</Text>
             </TouchableOpacity>
+
             <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Resultados')}>
                 <Text style={styles.buttonText}>Resultados Médicos</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Formulas_Ordenes')}>
-                <Text style={styles.buttonText}>Fromulaciones y Ordenamientos</Text>
+
+            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Medicamentos')}>
+                <Text style={styles.buttonText}>Medicamentos</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Tramites_Autorizaciones')}>
-                <Text style={styles.buttonText}>Tramites y Autorizaciones</Text>
-            </TouchableOpacity>
+
             <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Autocuidado')}>
                 <Text style={styles.buttonText}>Autocuidado</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Alertas')}>
-                <Text style={styles.buttonText}>Alertas</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Enterate')}>
-                <Text style={styles.buttonText}>Enterate</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Servicios')}>
-                <Text style={styles.buttonText}>Servicios</Text>
             </TouchableOpacity>
             
             <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
