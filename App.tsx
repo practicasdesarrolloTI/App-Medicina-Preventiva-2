@@ -1,8 +1,13 @@
-import React from 'react';
-import AppNavigation from './src/navigation/AppNavigation';
+import React from "react";
+import { PaperProvider } from "react-native-paper";
+import AppNavigation from "./src/navigation/AppNavigation";
 
 const App: React.FC = () => {
-  return <AppNavigation />;
+  return (
+    <PaperProvider>
+      <AppNavigation />
+    </PaperProvider>
+  );
 };
 
 export default App;

@@ -1,21 +1,28 @@
-import React from 'react';
+import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigation';
-import { auth } from '../../firebase';
+import { getToken, logoutUser } from "../services/authService";
 import styles from '../styles/HomeStyles';
 
 // Definir el tipo de las props
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
 const HomeScreen: React.FC<Props> = ({ navigation }) => {
+    const [userToken, setUserToken] = useState<string | null>(null);
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            const token = await getToken();
+            if (!token) navigation.replace("Login"); // Redirigir si no hay token
+            setUserToken(token);
+        };
+        checkAuth();
+    }, []);
+
     const handleLogout = async () => {
-        try {
-            await auth.signOut();
-            navigation.replace('Login');
-        } catch (error: any) {
-            alert(error.message);
-        }
+        await logoutUser();
+        navigation.replace("Login");
     };
 
     return (
@@ -26,7 +33,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
             <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Inicio')}>
                 <Text style={styles.buttonText}>Inicio</Text>
             </TouchableOpacity>
-            
+
             <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('TusCitas')}>
                 <Text style={styles.buttonText}>Ver Mis Citas</Text>
             </TouchableOpacity>
@@ -46,7 +53,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
             <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Autocuidado')}>
                 <Text style={styles.buttonText}>Autocuidado</Text>
             </TouchableOpacity>
-            
+
             <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
                 <Text style={styles.logoutButtonText}>Cerrar Sesión</Text>
             </TouchableOpacity>
