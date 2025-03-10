@@ -173,6 +173,34 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginLeft: 10,
   },
+  optionButton: {
+    padding: 10,
+    marginVertical: 5,
+    backgroundColor: colors.secondary,
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  
+  optionText: {
+    color: colors.white,
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  
+  nextButton: {
+    marginTop: 20,
+    backgroundColor: colors.primary,
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  
+  nextButtonText: {
+    color: colors.white,
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  
   
 });
 
