@@ -11,21 +11,6 @@ import { useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 type SurveyScreenProps = NativeStackScreenProps<RootStackParamList, "SurveyScreen">;
-
-// type SurveyScreenProps = {
-//     route: {
-//       params: {
-//         surveyId: string;
-//         preguntas: (
-//           | string
-//           | {
-//               pregunta: string;
-//               opciones: { texto: string; valor: number }[];
-//             }
-//         )[];
-  
-//     };
-//   };
   
 type Pregunta = 
   | string

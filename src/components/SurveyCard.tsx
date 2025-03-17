@@ -7,7 +7,6 @@ import { Survey } from '../screens/SelfCareScreen';
 type Props = {
   survey: Survey;
   onPress: () => void;
-  onEdit: () => void;
 };
 
 const SurveyCard: React.FC<Props> = ({ survey, onPress }) => {

@@ -61,7 +61,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
       />
 
       {/* 📌 Botón de Login */}
-      <Button mode="contained" onPress={handleLogin} style={styles.button}>
+      <Button mode="contained" onPress={() => navigation.navigate('Home')} style={styles.button}>
         Iniciar Sesión
       </Button>
 

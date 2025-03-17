@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from "react-native";
 import { MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
 import styles from "../styles/ResultStyles";
+import { fetchResults } from '../services/resultService';
+
 
 type Resultado = {
   id: string;
@@ -12,12 +14,17 @@ type Resultado = {
 };
 
 const ResultScreen = ({ navigation }: any) => {
-  const [resultados, setResultados] = useState<Resultado[]>([
-    { id: "1", fechaRealizacion: "10 de marzo 2024", examen: "Hemograma Completo", estado: "Disponible", programa: "Chequeo General" },
-    { id: "2", fechaRealizacion: "15 de marzo 2024", examen: "Radiografía de Tórax", estado: "Pendiente", programa: "Neumología" },
-    { id: "3", fechaRealizacion: "20 de marzo 2024", examen: "Prueba de Glucosa", estado: "Disponible", programa: "Diabetes" }
-  ]);
 
+
+  const [resultados, setResultados] = useState<Resultado[]>([]);
+
+  useEffect(() => {
+    const loadData = async () => {
+      const data = await fetchResults();
+      setResultados(data);
+    };
+    loadData();
+  }, []);
   return (
     <View style={styles.container}>
       {/* Botón para regresar */}
