@@ -72,6 +72,23 @@ const styles = StyleSheet.create({
   closeButton: {
     padding: 10,
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: Colors.primary,
+    fontWeight: "bold",
+  },
+  errorText: {
+    textAlign: "center",
+    fontSize: 16,
+    color: "red",
+    marginTop: 20,
+  },
 });
 
 export default styles;

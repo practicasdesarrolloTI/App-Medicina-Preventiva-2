@@ -13,6 +13,13 @@ const styles = StyleSheet.create({
       marginTop: 30,
       marginBottom: 40, 
     },
+    title: {
+      fontSize: 24,
+      fontWeight: "bold",
+      marginBottom: 20,
+      textAlign: "center",
+      color: Colors.primary,
+    },
     backButton: {
       top: 30,
       backgroundColor: Colors.primary,
@@ -68,6 +75,23 @@ const styles = StyleSheet.create({
       color: "white",
       fontSize: 16,
       marginLeft: 8,
+    },
+    loadingContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    loadingText: {
+      marginTop: 10,
+      fontSize: 16,
+      color: Colors.primary,
+      fontWeight: "bold",
+    },
+    errorText: {
+      textAlign: "center",
+      fontSize: 16,
+      color: "red",
+      marginTop: 20,
     },
   });
 

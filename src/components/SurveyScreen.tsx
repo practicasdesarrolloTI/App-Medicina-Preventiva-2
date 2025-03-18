@@ -1,13 +1,9 @@
 import React, { useState } from "react";
-
-
 import { View, Text, TouchableOpacity, TextInput, Alert } from "react-native";
 import styles from "../styles/SurveyStyles";
 import { useNavigation } from "@react-navigation/native";
-import { submitSurvey } from "../services/SurveyService";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/AppNavigation";
-import { useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 type SurveyScreenProps = NativeStackScreenProps<RootStackParamList, "SurveyScreen">;

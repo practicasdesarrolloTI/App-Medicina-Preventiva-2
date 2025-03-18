@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigation';
 import colors from '../themes/colors';
@@ -23,14 +23,23 @@ type Medicamento = {
 
 const MedicamentScreen: React.FC<Props> = ({ navigation }) => {
     const [medicamentos, setMedicamentos] = useState<Medicamento[]>([]);
-    
+
+    const [loading, setLoading] = useState(true); // Estado de carga
+
     useEffect(() => {
         const loadData = async () => {
-          const data = await fetchMedicaments();
-          setMedicamentos(data);
+            try {
+                const data = await fetchMedicaments();
+                setMedicamentos(data);
+            } catch (error) {
+                Alert.alert('Error', 'No se pudo cargar la información de los medicamentos');
+            }
+            finally {
+                setLoading(false);
+            }
         };
         loadData();
-      }, []);
+    }, []);
 
     return (
         <View style={styles.container}>
@@ -41,34 +50,44 @@ const MedicamentScreen: React.FC<Props> = ({ navigation }) => {
                 <Image source={require('../../assets/icons8-medicine.gif')} style={styles.imageSize} />
             </View>
             <Text style={styles.title}>Gestión de Medicamentos</Text>
-            <FlatList
-                data={medicamentos}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item }) => (
-                    <View style={styles.card}>
-                        <Text style={styles.text}><FontAwesome5 name="pills" size={16} /> {item.nombre}</Text>
-                        <Text style={styles.text}><MaterialIcons name="event" size={16} /> {item.fechaOrden}</Text>
-                        <Text style={styles.text}><FontAwesome5 name="user-md" size={16} /> {item.medico}</Text>
-                        <Text style={[styles.status, item.estado === 'Pendiente' ? styles.pending : item.estado === 'Reformulado' ? styles.reformulated : styles.downloaded]}>
-                            {item.estado}
-                        </Text>
-                        <View style={styles.buttonContainer}>
-                            <TouchableOpacity style={styles.actionButton}>
-                                <FontAwesome5 name="file-download" size={16} color={colors.white} />
-                                <Text style={styles.buttonText}>Descargar</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.actionButton}>
-                                <FontAwesome5 name="redo" size={16} color={colors.white} />
-                                <Text style={styles.buttonText}>Renovar</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.actionButton}>
-                                <FontAwesome5 name="file-medical" size={16} color={colors.white} />
-                                <Text style={styles.buttonText}>Pedir</Text>
-                            </TouchableOpacity>
+            {/* Indicador de carga */}
+            {loading ? (
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color={colors.primary} />
+                    <Text style={styles.loadingText}>Cargando información de sus Medicamentos...</Text>
+                </View>
+            ) : medicamentos ? (
+                <FlatList
+                    data={medicamentos}
+                    keyExtractor={(item) => item.id}
+                    renderItem={({ item }) => (
+                        <View style={styles.card}>
+                            <Text style={styles.text}><FontAwesome5 name="pills" size={16} /> {item.nombre}</Text>
+                            <Text style={styles.text}><MaterialIcons name="event" size={16} /> {item.fechaOrden}</Text>
+                            <Text style={styles.text}><FontAwesome5 name="user-md" size={16} /> {item.medico}</Text>
+                            <Text style={[styles.status, item.estado === 'Pendiente' ? styles.pending : item.estado === 'Reformulado' ? styles.reformulated : styles.downloaded]}>
+                                {item.estado}
+                            </Text>
+                            <View style={styles.buttonContainer}>
+                                <TouchableOpacity style={styles.actionButton}>
+                                    <FontAwesome5 name="file-download" size={16} color={colors.white} />
+                                    <Text style={styles.buttonText}>Descargar</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.actionButton}>
+                                    <FontAwesome5 name="redo" size={16} color={colors.white} />
+                                    <Text style={styles.buttonText}>Renovar</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.actionButton}>
+                                    <FontAwesome5 name="file-medical" size={16} color={colors.white} />
+                                    <Text style={styles.buttonText}>Pedir</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
-                    </View>
-                )}
-            />
+                    )}
+                />
+            ) : (
+                <Text style={styles.errorText}>No se pudo cargar la información de sus Medicamentos</Text>
+            )}
         </View>
     );
 };

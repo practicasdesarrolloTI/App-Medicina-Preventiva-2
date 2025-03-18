@@ -30,9 +30,10 @@ export type Survey = {
 const SelfCareScreen: React.FC<Props> = ({ navigation }) => {
   const [encuestas, setEncuestas] = useState<Survey[]>([
     findriscSurvey, // Incluimos la encuesta FINDRISC
-    { id: '2', nombre: 'COULD IT BE COPD', descripcion: 'Evalúa síntomas de EPOC', preguntas: ['¿Tiene tos frecuente?', '¿Siente falta de aire?'] },
-    { id: '3', nombre: 'Karnofsky Scale', descripcion: 'Evalúa el estado funcional', preguntas: ['¿Puede realizar tareas sin ayuda?', '¿Se siente fatigado?'] },
+
   ]);
+
+  const [loading, setLoading] = useState(true); // Estado de carga
 
   // 🔄 Navegar a la encuesta seleccionada
   const handleOpenSurvey = (survey: Survey) => {
