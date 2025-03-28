@@ -65,6 +65,14 @@ const styles = StyleSheet.create({
       color: "red",
       marginTop: 20,
     },
+    containerLoading: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: "white",
+      padding: 20,
+      paddingTop: 20,
+    },
   });
 
   export default styles;

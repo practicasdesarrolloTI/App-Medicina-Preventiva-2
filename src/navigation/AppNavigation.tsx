@@ -28,18 +28,55 @@ export type RootStackParamList = {
   SurveySummary: {
     surveyId: string;
     responses: string[];
+    puntaje: number;
+    edad: number;
+    sexo: string;
+    survey: {
+      id: string;
+      nombre: string;
+      descripcion: string;
+      requiereEdad: boolean;
+      requiereSexo: boolean;
+      preguntas: {
+        omitida: boolean;
+        pregunta: string;
+        opciones: { texto: string; valor: number; sexo: string }[];
+        recomendaciones?: string;
+      }[];
+      recomendaciones?: {
+        min: number;
+        max: number;
+        texto: string;
+        sexo: string | null;
+      }[];
+    };
   };
   SurveyScreen: {
     surveyId: string;
-    preguntas: (
-      | string
-      | {
-          pregunta: string;
-          opciones: { texto: string; valor: number }[];
-        }
-    )[];
+    preguntas: {
+      omitida: boolean;
+      pregunta: string;
+      opciones: { texto: string; valor: number; sexo: string }[];
+      recomendaciones?: string;
+    }[];
+    edad: number;
+    sexo: string;
+    survey: {
+      id: string;
+      nombre: string;
+      descripcion: string;
+      preguntas: {
+        omitida: boolean;
+        pregunta: string;
+        opciones: { texto: string; valor: number; sexo: string }[];
+        recomendaciones?: string;
+      }[];
+      requiereEdad: boolean;
+      requiereSexo: boolean;
+    };
   };
 };
+
 
 const Stack = createStackNavigator<RootStackParamList>();
 

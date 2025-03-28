@@ -12,6 +12,7 @@ const styles = StyleSheet.create({
       fontSize: 24,
       fontWeight: 'bold',
       marginBottom: 20,
+      fontFamily: 'Taviraj_500Regular',
     },
     input: {
       width: '80%',

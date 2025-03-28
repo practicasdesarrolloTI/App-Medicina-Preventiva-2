@@ -21,6 +21,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 20,
     color: colors.primary,
+    fontFamily: 'lucida grande',
   },
   input: {
     marginBottom: 10,
@@ -32,6 +33,17 @@ const styles = StyleSheet.create({
   link: {
     marginTop: 10,
     color: colors.secondary,
+  },
+  picker: {
+    width: "100%",
+    borderColor: colors.lightGray,
+    backgroundColor: colors.white,
+    //marginBottom: 10,
+  },
+  inputContainer: {
+    borderWidth: 10,
+    borderColor: colors.lightGray,
+    borderRadius: 5,
   },
 });
 

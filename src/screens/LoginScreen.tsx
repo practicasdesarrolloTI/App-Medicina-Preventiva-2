@@ -6,22 +6,32 @@ import { RootStackParamList } from "../navigation/AppNavigation";
 import { loginUser } from "../services/authService";
 import styles from "../styles/AuthStyles";
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Picker } from "@react-native-picker/picker";
+
+
+
+
 type Props = NativeStackScreenProps<RootStackParamList, "Login">;
 
 const LoginScreen: React.FC<Props> = ({ navigation }) => {
   const [document, setDocument] = useState("");
+  const [documentType, setDocumentType] = useState<DocumentType | ''>('');
   const [password, setPassword] = useState("");
   const [visible, setVisible] = useState(false);
   const [message, setMessage] = useState("");
 
+
   const handleLogin = async () => {
-    if (!document || !password) {
+    if (!documentType || !document || !password) {
       setMessage("Todos los campos son obligatorios");
       setVisible(true);
       return;
     }
 
     const result = await loginUser(Number(document), password);
+
+    await AsyncStorage.setItem('documento', document);
 
     if (!result.success) {
       setMessage(result.message);
@@ -39,6 +49,24 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
       <Text variant="titleLarge" style={styles.title}>
         Iniciar Sesión
       </Text>
+    <View style={styles.inputContainer}>
+
+      <Picker
+        selectedValue={documentType}
+        onValueChange={(itemValue) => setDocumentType(itemValue)}
+        style={styles.picker}
+      >
+        <Picker.Item label="Seleccione Tipo de Documento" value="" enabled={false}/>
+        <Picker.Item label="Cédula de Ciudadanía" value="CC" />
+        <Picker.Item label="Cédula de Extranjería" value="CE" />
+        <Picker.Item label="Pasaporte" value="PAS" />
+        <Picker.Item label="Tarjeta de Identidad" value="TI" />
+        <Picker.Item label="Registro Civil" value="RC" />
+        <Picker.Item label="Número de Identidad" value="NI" />
+      </Picker>
+      </View>
+
+      {/* 📌 Tipo de Documento */}
 
       {/* 📌 Número de Documento */}
       <TextInput
@@ -61,7 +89,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
       />
 
       {/* 📌 Botón de Login */}
-      <Button mode="contained" onPress={() => navigation.navigate('Home')} style={styles.button}>
+      <Button mode="contained" onPress={(handleLogin)} style={styles.button}>
         Iniciar Sesión
       </Button>
 

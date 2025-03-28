@@ -1,99 +1,99 @@
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import colors from "../themes/colors";
 import styles from "../styles/PatientinfoStyles";
-import { useState, useEffect } from "react";
-import { fetchPatient } from "../services/patientService";
-import { Alert } from "react-native";
+import { getPatientByDocument } from "../services/patientService";
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigation';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { calcularEdad } from '../utils/dateUtils';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Inicio'>;
 
 type Paciente = {
-  nombre: string;
-  edad: number;
+  primer_nombre: string;
+  segundo_nombre?: string;
+  primer_apellido: string;
+  segundo_apellido?: string;
+  tipo_documento: string;
+  documento: string;
+  fecha_nacimiento: string;
+  codigo_ips: number;
   sexo: string;
-  direccion: string;
-  telefono: string;
-  ciudad: string;
-  departamento: string;
-  antecedentes: string;
-  medicoCabecera: string;
-  especialidad: string;
+  celular: number;
+  telefono: number;
+  correo: string;
+  eps: string;
+  iat: number;
 };
 
 const PatientInfoScreen: React.FC<Props> = ({ navigation }) => {
-  const [Paciente, setPatient] = useState<Paciente[]>([]);
-  const [loading, setLoading] = useState(true); // Estado de carga
+  const [paciente, setPaciente] = useState<Paciente | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadPatient = async () => {
       try {
-        const data = await fetchPatient();
-        setPatient(data);
+        const storedDoc = await AsyncStorage.getItem('documento');
+        if (!storedDoc) {
+          Alert.alert("Error", "No se encontró el documento del paciente.");
+          return;
+        }
+  
+        const data = await getPatientByDocument(storedDoc);
+        setPaciente(data as unknown as Paciente);
       } catch (error) {
-        Alert.alert("Error", "No se pudo cargar la información del paciente");
-      } finally {
+        Alert.alert("Error", "Error al obtener información del paciente.");
+      }
+      finally {
         setLoading(false);
       }
     };
+  
     loadPatient();
   }, []);
+  
 
-
+  if (loading) {
+    return (
+      <View style={styles.containerLoading}>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={{ marginTop: 20 }}>Cargando información del paciente...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-      {/* Botón para regresar al menú */}
+      {/* Botón para regresar */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <MaterialIcons name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
       </View>
 
-      {/* Icono de perfil centrado */}
+      {/* Icono de perfil */}
       <View style={styles.profileIconContainer}>
         <MaterialIcons name="account-circle" size={100} color={colors.primary} />
       </View>
 
-
-      {/* Indicador de carga */}
-      {loading ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.primary} />
-          <Text style={styles.loadingText}>Cargando información...</Text>
-        </View>
-      ) : Paciente.length > 0 ? (
-        <View style={styles.infoContainer}>
-          {Paciente.map((paciente, index) => (
-            <View key={index}>
-              <Text style={styles.label}><Text style={styles.bold}>Nombre:</Text> {paciente.nombre}</Text>
-              <Text style={styles.label}><Text style={styles.bold}>Edad:</Text> {paciente.edad} años</Text>
-              <Text style={styles.label}><Text style={styles.bold}>Sexo:</Text> {paciente.sexo}</Text>
-              <Text style={styles.label}><Text style={styles.bold}>Dirección:</Text> {paciente.direccion}</Text>
-              <Text style={styles.label}><Text style={styles.bold}>Teléfono:</Text> {paciente.telefono}</Text>
-              <Text style={styles.label}><Text style={styles.bold}>Ciudad:</Text> {paciente.ciudad}</Text>
-              <Text style={styles.label}><Text style={styles.bold}>Departamento:</Text> {paciente.departamento}</Text>
-              <Text style={styles.label}><Text style={styles.bold}>Antecedentes personales:</Text> {paciente.antecedentes}</Text>
-              <Text style={styles.label}><Text style={styles.bold}>Médico de cabecera:</Text> {paciente.medicoCabecera}</Text>
-              <Text style={styles.label}><Text style={styles.bold}>Especialidad:</Text> {paciente.especialidad}</Text>
-            </View>
-          ))}
-        </View>
-
-      ) : (
-        <Text style={styles.errorText}>No se pudo cargar la información del paciente.</Text>
-      )}
-
-
-
-      {/* Información del Paciente */}
+      {/* Información del paciente */}
+      <View style={styles.infoContainer}>
+        <Text style={styles.label}><Text style={styles.bold}>Nombre:</Text> {paciente?.primer_nombre} {paciente?.segundo_nombre} {paciente?.primer_apellido} {paciente?.segundo_apellido}</Text>
+        <Text style={styles.label}><Text style={styles.bold}>Documento:</Text> {paciente?.tipo_documento} {paciente?.documento}</Text>
+        <Text style={styles.label}><Text style={styles.bold}>Código IPS:</Text> {paciente?.codigo_ips}</Text>
+        <Text style={styles.label}><Text style={styles.bold}>Sexo:</Text> {paciente?.sexo === "M" ? "Masculino" : "Femenino"}</Text>
+        <Text style={styles.label}><Text style={styles.bold}>Fecha de Nacimiento:</Text> {paciente?.fecha_nacimiento}</Text>
+        <Text style={styles.label}><Text style={styles.bold}>Edad:</Text> {paciente ? calcularEdad(paciente.fecha_nacimiento) : "No disponible"}</Text>
+        <Text style={styles.label}><Text style={styles.bold}>Celular:</Text> {paciente?.celular}</Text>
+        <Text style={styles.label}><Text style={styles.bold}>Teléfono:</Text> {paciente?.telefono}</Text>
+        <Text style={styles.label}><Text style={styles.bold}>Correo:</Text> {paciente?.correo}</Text>
+        <Text style={styles.label}><Text style={styles.bold}>EPS:</Text> {paciente?.eps}</Text>
+        <Text style={styles.label}><Text style={styles.bold}>IAT:</Text> {paciente?.iat}</Text>
+      </View>
     </View>
   );
 };
-
-
 
 export default PatientInfoScreen;

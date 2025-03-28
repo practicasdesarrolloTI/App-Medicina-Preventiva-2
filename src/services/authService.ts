@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_URL = "http://10.0.2.2:5000/api/auth"; // Asegúrate de reemplazar con tu IP local si pruebas en un dispositivo real
+const API_URL = "http://10.0.2.2:5000/api/auth";
 
 // Registrar usuario
 export const registerUser = async (documentType: DocumentType, document: number, password: string) => {
