@@ -16,6 +16,7 @@ const Colors = {
     error: '#8A0303',
     blue: '#0000FF',
     red: '#FF0000',
+    gray: '#B1EDE8',
 }
 
 export default Colors;

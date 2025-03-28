@@ -25,6 +25,7 @@ const styles = StyleSheet.create({
   },
   input: {
     marginBottom: 10,
+    color: colors.gray
   },
   button: {
     marginTop: 10,
@@ -38,12 +39,9 @@ const styles = StyleSheet.create({
     width: "100%",
     borderColor: colors.lightGray,
     backgroundColor: colors.white,
-    //marginBottom: 10,
-  },
-  inputContainer: {
     borderWidth: 10,
-    borderColor: colors.lightGray,
     borderRadius: 5,
+    //marginBottom: 10,
   },
 });
 

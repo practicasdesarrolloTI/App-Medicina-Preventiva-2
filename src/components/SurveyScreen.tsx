@@ -28,10 +28,10 @@ type Opcion = {
 type Pregunta =
   | string
   | {
-      pregunta: string;
-      opciones?: Opcion[];
-      omitida?: boolean;
-    };
+    pregunta: string;
+    opciones?: Opcion[];
+    omitida?: boolean;
+  };
 
 const SurveyScreen: React.FC<SurveyScreenProps> = ({ route }) => {
   const { preguntas, surveyId, edad, sexo, survey } = route.params;
@@ -49,7 +49,7 @@ const SurveyScreen: React.FC<SurveyScreenProps> = ({ route }) => {
   });
 
   // ✅ Insertar preguntas de estatura/peso si se requiere IMC
-  if (survey.requiereEdad) {
+  if (survey.requiredIMC) {
     finalPreguntas = [
       { pregunta: "¿Cuál es tu estatura en metros?", opciones: [], omitida: false },
       { pregunta: "¿Cuál es tu peso en kilogramos?", opciones: [], omitida: false },
@@ -68,9 +68,12 @@ const SurveyScreen: React.FC<SurveyScreenProps> = ({ route }) => {
       setSelectedOption(responses[currentIndex + 1] || "");
     } else {
       // Si ya estamos en la última pregunta
-      const puntajeTotal = responses
-        .filter((r) => typeof r === "number")
-        .reduce((acc, val) => acc + val, 0);
+      const puntajeTotal = survey.calcularPuntaje
+        ? survey.calcularPuntaje(responses, edad, sexo)
+        : responses
+          .filter((r) => typeof r === "number")
+          .reduce((acc, val) => acc + val, 0);
+
 
       navigation.navigate("SurveySummary", {
         surveyId,

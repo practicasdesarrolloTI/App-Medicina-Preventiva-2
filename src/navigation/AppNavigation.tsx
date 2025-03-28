@@ -49,6 +49,7 @@ export type RootStackParamList = {
         texto: string;
         sexo: string | null;
       }[];
+      calcularPuntaje?: (responses: any[], edad: number, sexo: string) => number;
     };
   };
   SurveyScreen: {
@@ -62,6 +63,7 @@ export type RootStackParamList = {
     edad: number;
     sexo: string;
     survey: {
+      calcularPuntaje?: any;
       id: string;
       nombre: string;
       descripcion: string;
@@ -70,9 +72,11 @@ export type RootStackParamList = {
         pregunta: string;
         opciones: { texto: string; valor: number; sexo: string }[];
         recomendaciones?: string;
+        calcularPuntaje?: any;
       }[];
       requiereEdad: boolean;
       requiereSexo: boolean;
+      requiredIMC?: boolean;
     };
   };
 };

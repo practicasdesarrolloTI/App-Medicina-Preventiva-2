@@ -8,6 +8,7 @@ import styles from "../styles/AuthStyles";
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from "@react-native-picker/picker";
+import colors from "../themes/colors";
 
 
 
@@ -49,14 +50,13 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
       <Text variant="titleLarge" style={styles.title}>
         Iniciar Sesión
       </Text>
-    <View style={styles.inputContainer}>
 
       <Picker
         selectedValue={documentType}
         onValueChange={(itemValue) => setDocumentType(itemValue)}
         style={styles.picker}
       >
-        <Picker.Item label="Seleccione Tipo de Documento" value="" enabled={false}/>
+        <Picker.Item label="Seleccione Tipo de Documento" value="" style={{ color: colors.gray }}/>
         <Picker.Item label="Cédula de Ciudadanía" value="CC" />
         <Picker.Item label="Cédula de Extranjería" value="CE" />
         <Picker.Item label="Pasaporte" value="PAS" />
@@ -64,9 +64,8 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
         <Picker.Item label="Registro Civil" value="RC" />
         <Picker.Item label="Número de Identidad" value="NI" />
       </Picker>
-      </View>
+      
 
-      {/* 📌 Tipo de Documento */}
 
       {/* 📌 Número de Documento */}
       <TextInput

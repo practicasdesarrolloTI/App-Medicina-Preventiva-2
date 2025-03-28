@@ -4,6 +4,7 @@ export const lawtonBrodySurvey = {
   descripcion: "Evalúa habilidades funcionales del adulto mayor",
   requiereEdad: false,
   requiereSexo: false,
+  requireIMC: false,
   preguntas: [
     {
       pregunta: "¿Puede usar el teléfono sin ayuda?",

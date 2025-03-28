@@ -24,11 +24,12 @@ type Survey = {
   nombre: string;
   descripcion: string;
   preguntas: (
-    | { omitida: any; pregunta: string; opciones: { texto: string; valor: number; sexo: any }[]; recomendaciones?: string }
-    | { omitida: any; pregunta: string; opciones: { texto: string; valor: number; sexo: any }[]; recomendaciones?: string }
+    | { omitida: any; pregunta: string; opciones: { texto: string; valor: number; sexo: any | null }[]; recomendaciones?: string }
+    | { omitida: any; pregunta: string; opciones: { texto: string; valor: number; sexo: any | null }[]; recomendaciones?: string }
   )[];
   requiereEdad: boolean;
   requiereSexo: boolean;
+  requiredIMC: boolean;
 };
 
 type NavigationProp = NativeStackNavigationProp<
@@ -38,7 +39,7 @@ type NavigationProp = NativeStackNavigationProp<
 type Paciente = {
   fecha_nacimiento: string;
   edad: number;
-  sexo: string;
+  sexo?: string;
 };
 const SelfCareScreen: React.FC = () => {
   const [paciente, setPaciente] = useState<Paciente | null>(null);
@@ -63,9 +64,9 @@ const SelfCareScreen: React.FC = () => {
     loadPatient();
   }, []);
   const [encuestas, setEncuestas] = useState<Survey[]>([
-    { ...findriscSurvey, requiereEdad: true, requiereSexo: true },
-    { ...lawtonBrodySurvey, requiereEdad: false, requiereSexo: false },
-    { ...framinghamSurvey, requiereEdad: true, requiereSexo: true },
+    { ...findriscSurvey, requiereEdad: true, requiereSexo: true, requiredIMC: true },
+    { ...lawtonBrodySurvey, requiereEdad: false, requiereSexo: false, requiredIMC: false },
+    { ...framinghamSurvey, requiereEdad: true, requiereSexo: true, requiredIMC: false },
   ]);
 
 

@@ -5,21 +5,51 @@ export const findriscSurvey = {
   requiereEdad: true,
   requiereSexo: true,
   requireIMC: true,
-  calcularEdad: (edad: number) => {
-    if (edad < 45) return 0;
-    if (edad >= 45 && edad <= 54) return 2;
-    if (edad >= 55 && edad <= 64) return 3;
-    return 4;
-  },
-  calcularIMC: (peso: number, estatura: number) => {
-    if (peso && estatura) {
-      const imc = peso / (estatura * estatura);
-      if (imc < 25) return 0;
-      if (imc >= 25 && imc <= 30) return 1;
-      return 3;
+
+  calcularPuntaje: (respuestas: any[], edad: number, sexo: string) => {
+    let puntaje = 0;
+  
+    // Edad (según FINDRISC)
+    if (edad < 45) {
+      puntaje += 0;
+    } else if (edad >= 45 && edad <= 54) {
+      puntaje += 2;
+    } else if (edad >= 55) {
+      puntaje += 3;
     }
-    return NaN;
-  },
+  
+    // ✅ IMC (índice de masa corporal)
+    const estatura = parseFloat(respuestas[0]);
+    const peso = parseFloat(respuestas[1]);
+    const imc = peso && estatura ? peso / (estatura * estatura) : 0;
+  
+    if (imc >= 25 && imc <= 30) {
+      puntaje += 1;
+    } else if (imc > 30) {
+      puntaje += 3;
+    }
+  
+    // Circunferencia abdominal (pregunta con opciones)
+    puntaje += Number(respuestas[2] || 0);
+  
+    //  Actividad física
+    puntaje += Number(respuestas[3] || 0);
+  
+    //  Consumo de frutas y vegetales
+    puntaje += Number(respuestas[4] || 0);
+  
+    //  Medicación para presión alta
+    puntaje += Number(respuestas[5] || 0);
+  
+    // Nivel alto de glucosa
+    puntaje += Number(respuestas[6] || 0);
+  
+    //  Familiares con diabetes
+    puntaje += Number(respuestas[7] || 0);
+  
+    return puntaje;
+  },  
+
   preguntas: [
     {
       pregunta: "¿Tiene antecedentes familiares de diabetes?",
@@ -74,7 +104,7 @@ export const findriscSurvey = {
         { texto: "No", valor: 0, sexo: null },
         { texto: "Sí", valor: 5, sexo: null },
       ],
-      
+
     },
   ],
     recomendaciones: [
@@ -84,5 +114,6 @@ export const findriscSurvey = {
       { min: 15, max: 20, texto: 'Riesgo alto. Evaluación médica necesaria.', sexo: null },
       { min: 21, max: 26, texto: 'Riesgo muy alto. Remitir a especialista.', sexo: null }
     ],
+    
 };
 
