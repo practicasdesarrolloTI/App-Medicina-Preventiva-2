@@ -1,174 +1,11 @@
-// import React from "react";
-// import {
-//   View,
-//   Text,
-//   TouchableOpacity,
-//   Alert,
-//   StyleSheet,
-// } from "react-native";
-// import { NativeStackScreenProps } from "@react-navigation/native-stack";
-// import { RootStackParamList } from "../navigation/AppNavigation";
-// import { submitSurvey } from "../services/SurveyService";
-// import colors from "../themes/colors";
-// import { MaterialIcons } from "@expo/vector-icons";
-
-// type SurveySummaryProps = NativeStackScreenProps<
-//   RootStackParamList,
-//   "SurveySummary"
-// >;
-
-// const SurveySummary: React.FC<SurveySummaryProps> = ({ route, navigation }) => {
-//   const { surveyId, responses, puntaje, edad, sexo, survey } = route.params;
-
-//   const estatura = parseFloat(responses[0]);
-//   const peso = parseFloat(responses[1]);
-//   const imc = peso && estatura ? peso / (estatura * estatura) : NaN;
-
-//   const otrasRespuestas = responses.slice(2); // después de estatura/peso
-
-//   const obtenerRecomendacion = (): string => {
-//     if (!survey.recomendaciones) return "No hay recomendaciones definidas.";
-  
-//     const recomendacionesFiltradas = survey.recomendaciones.filter(
-//       (r: any) =>
-//         (r.sexo?.toLowerCase?.() === sexo?.toLowerCase?.() || r.sexo === null)
-//     );
-  
-//     const encontrada = recomendacionesFiltradas.find(
-//       (r: any) => puntaje >= r.min && puntaje <= r.max
-//     );
-  
-//     return encontrada ? encontrada.texto : "Sin recomendación específica.";
-//   };
-  
-//   const recomendacion = obtenerRecomendacion();
-  
-
-//   const handleSubmit = async () => {
-//     const result = await submitSurvey(surveyId, responses);
-//     if (result.error) {
-//       Alert.alert("Error", result.error);
-//     } else {
-//       Alert.alert("Éxito", "Encuesta enviada correctamente");
-//       navigation.navigate("Home");
-//     }
-//   };
-
-//   return (
-//     <View style={styles.container}>
-//       <View style={styles.header}>
-//         <TouchableOpacity
-//           style={styles.backButton}
-//           onPress={() => navigation.goBack()}
-//         >
-//           <MaterialIcons name="arrow-back" size={24} color="white" />
-//         </TouchableOpacity>
-//       </View>
-
-//       <View style={styles.summaryContainer}>
-//         <Text style={styles.response}>
-//           <Text style={styles.bold}>Puntaje total:</Text> {puntaje}
-//         </Text>
-//         <Text style={styles.response}>
-//           <Text style={styles.bold}>Recomendación:</Text> {recomendacion}
-//         </Text>
-
-//         <Text style={styles.title}>Resumen de Respuestas</Text>
-
-//         <View style={styles.summaryInfo}>
-//           <Text style={styles.response}>
-//             <Text style={styles.bold}>Edad:</Text> {edad}
-//           </Text>
-//           <Text style={styles.response}>
-//             <Text style={styles.bold}>Sexo:</Text> {sexo}
-//           </Text>
-//           <Text style={styles.response}>
-//             <Text style={styles.bold}>Estatura:</Text> {estatura} m
-//           </Text>
-//           <Text style={styles.response}>
-//             <Text style={styles.bold}>Peso:</Text> {peso} kg
-//           </Text>
-//           <Text style={styles.response}>
-//             <Text style={styles.bold}>IMC Calculado:</Text>{" "}
-//             {isNaN(imc) ? "N/A" : imc.toFixed(2)}
-//           </Text>
-
-//           {otrasRespuestas.map((res, i) => (
-//             <Text key={i} style={styles.response}>
-//               <Text style={styles.bold}>Pregunta {i + 1}:</Text> {res}
-//             </Text>
-//           ))}
-//         </View>
-//       </View>
-
-//       <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-//         <Text style={styles.buttonText}>Enviar Encuesta</Text>
-//       </TouchableOpacity>
-//     </View>
-//   );
-// };
-
-// const styles = StyleSheet.create({
-//   container: { flex: 1, padding: 20, backgroundColor: colors.white },
-//   header: {
-//     alignItems: "flex-start",
-//     padding: 15,
-//     marginTop: 30,
-//     marginBottom: 20,
-//   },
-//   backButton: {
-//     top: 30,
-//     backgroundColor: colors.primary,
-//     padding: 10,
-//     borderRadius: 50,
-//     alignItems: "center",
-//     justifyContent: "center",
-//     elevation: 5,
-//   },
-//   summaryContainer: { flex: 1, alignItems: "center" },
-//   summaryInfo: {
-//     backgroundColor: colors.background,
-//     padding: 15,
-//     borderRadius: 10,
-//     width: "95%",
-//     elevation: 3,
-//   },
-//   title: {
-//     fontSize: 22,
-//     fontWeight: "bold",
-//     marginBottom: 15,
-//     textAlign: "center",
-//     color: colors.primary,
-//   },
-//   response: {
-//     fontSize: 16,
-//     marginBottom: 10,
-//   },
-//   bold: {
-//     fontWeight: "bold",
-//     color: colors.primary,
-//   },
-//   button: {
-//     backgroundColor: colors.primary,
-//     padding: 12,
-//     borderRadius: 8,
-//     alignItems: "center",
-//   },
-//   buttonText: {
-//     color: colors.white,
-//     fontSize: 16,
-//     fontWeight: "bold",
-//   },
-// });
-
-// export default SurveySummary;
-
-
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigation';
 import colors from '../themes/colors';
+import { submitSurveyResult } from '../services/surveyResultService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Toast from 'react-native-toast-message';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SurveySummary'>;
 
@@ -186,6 +23,64 @@ const SurveySummary: React.FC<Props> = ({ route, navigation }) => {
       return rec.min <= puntaje && puntaje <= rec.max && sexoMatch;
     });
     return recomendacion?.texto || 'No se encontró recomendación.';
+  };
+
+  // const handleSubmit = async () => {
+  //   const result = await submitSurvey(surveyId, responses);
+  //   if (result.error) {
+  //     Alert.alert("Error", result.error);
+  //   } else {
+  //     Alert.alert("Éxito", "Encuesta enviada correctamente");
+  //     navigation.navigate("Home");
+  //   }
+  // };
+
+  const handleSubmit = async () => {
+    try {
+      const storedPatientId = await AsyncStorage.getItem('documento');
+      if (!storedPatientId) {
+        Alert.alert('Error', 'No se encontró el documento del paciente.');
+        return;
+      }
+  
+      const recomendacion = getRecomendacion();
+  
+      const result = await submitSurveyResult({
+        surveyId,
+        patientId: storedPatientId,
+        surveyName: survey.nombre,
+        responses,
+        puntaje,
+        edad,
+        sexo,
+        recomendacion,
+      });
+  
+      if (result.error) {
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: result.error,
+        });
+        
+      } else {
+        // Toast.show({
+        //   type: 'success',
+        //   text1: 'Éxito Resultado guardado con éxito',
+        //   text2: 'Resultado guardado correctamente',
+        // });
+        Toast.show({
+          type: 'customBlue',
+          text1: 'Éxito',
+          text2: 'Resultado guardado correctamente',
+          position: 'bottom',
+          visibilityTime: 5000,
+        });
+        navigation.navigate('Home');
+      }
+    } catch (e) {
+      Alert.alert('Error', 'Algo salió mal al guardar la encuesta.');
+    }
   };
 
   return (
@@ -219,6 +114,10 @@ const SurveySummary: React.FC<Props> = ({ route, navigation }) => {
 
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Text style={styles.backButtonText}>Volver</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.backButton} onPress={handleSubmit}>
+        <Text style={styles.backButtonText}>Enviar Encuesta</Text>
       </TouchableOpacity>
     </ScrollView>
   );

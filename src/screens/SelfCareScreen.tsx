@@ -19,6 +19,8 @@ import { getPatientByDocument } from "../services/patientService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { calcularEdad } from '../utils/dateUtils';
 
+
+
 type Survey = {
   id: string;
   nombre: string;
@@ -44,6 +46,7 @@ type Paciente = {
 const SelfCareScreen: React.FC = () => {
   const [paciente, setPaciente] = useState<Paciente | null>(null);
   const navigation = useNavigation<NavigationProp>();
+  //const [encuestas, setEncuestas] = useState<Survey[]>([]); // Inicializa el estado de encuestas como un array vacío si se quieren obtener de la API
 
   const loadPatient = async () => {
     try {
@@ -60,9 +63,23 @@ const SelfCareScreen: React.FC = () => {
     }
   };
 
+
+  // const cargarEncuestas = async () => {
+  //   try {
+  //     const data = await fetchAllSurveys();
+  //     setEncuestas(data as Survey[]); // usa setEncuestas correctamente
+  //   } catch (error) {
+  //     Alert.alert('Error', 'No se pudieron cargar las encuestas');
+  //   }
+  // };
+
+
   useEffect(() => {
     loadPatient();
+    //cargarEncuestas();
   }, []);
+
+
   const [encuestas, setEncuestas] = useState<Survey[]>([
     { ...findriscSurvey, requiereEdad: true, requiereSexo: true, requiredIMC: true },
     { ...lawtonBrodySurvey, requiereEdad: false, requiereSexo: false, requiredIMC: false },
@@ -73,19 +90,20 @@ const SelfCareScreen: React.FC = () => {
 
   const handleOpenSurvey = (survey: Survey) => {
     if (!paciente) return;
-  
+
     const edad = calcularEdad(paciente.fecha_nacimiento);
     const sexo = paciente.sexo === 'M' ? 'Masculino' : 'Femenino';
-  
+
     navigation.navigate("SurveyScreen", {
       surveyId: survey.id,
       preguntas: survey.preguntas,
       edad,
       sexo,
-      survey, // importante enviar el objeto completo con recomendaciones
+      survey, 
     });
   };
-  
+
+
 
   return (
     <View style={styles.container}>
@@ -145,7 +163,7 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     padding: 15,
     marginTop: 30,
-    marginBottom: 20, 
+    marginBottom: 20,
   },
   backButton: {
     top: 30,
