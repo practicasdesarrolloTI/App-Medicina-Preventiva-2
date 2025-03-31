@@ -63,7 +63,7 @@ const SurveyScreen: React.FC<SurveyScreenProps> = ({ route }) => {
   }
 
   const handleNext = () => {
-    if (responses[currentIndex] === undefined || responses[currentIndex] === "") {
+    if (responses[currentIndex] === undefined || responses[currentIndex].texto === "") {
       Alert.alert("Error", "Por favor responde antes de continuar.");
       return;
     }
@@ -87,7 +87,7 @@ const SurveyScreen: React.FC<SurveyScreenProps> = ({ route }) => {
 
       navigation.navigate("SurveySummary", {
         surveyId,
-        responses,
+        responses: responses.map((r) => r.texto),
         puntaje: puntajeTotal,
         edad,
         sexo,
@@ -113,7 +113,7 @@ const SurveyScreen: React.FC<SurveyScreenProps> = ({ route }) => {
   const handleResponseChange = (respuesta: string | { texto: string; valor: number }) => {
     const updated = [...responses];
     if (typeof respuesta === "string") {
-      updated[currentIndex] = respuesta;
+      updated[currentIndex] = typeof respuesta === "string" ? { texto: respuesta, valor: 0 } : respuesta;
       setSelectedOption(respuesta); // Para marcar la opción seleccionada
     } else {
       updated[currentIndex] = respuesta;
