@@ -33,10 +33,13 @@ type Pregunta =
     omitida?: boolean;
   };
 
-  type Respuesta = {
+type Respuesta =
+  | string
+  | {
     texto: string;
     valor: number;
   };
+
 
 const SurveyScreen: React.FC<SurveyScreenProps> = ({ route }) => {
   const { preguntas, surveyId, edad, sexo, survey } = route.params;
@@ -63,7 +66,8 @@ const SurveyScreen: React.FC<SurveyScreenProps> = ({ route }) => {
   }
 
   const handleNext = () => {
-    if (responses[currentIndex] === undefined || responses[currentIndex].texto === "") {
+    const r = responses[currentIndex];
+    if (r === undefined || (typeof r === 'string' && r === '')) {
       Alert.alert("Error", "Por favor responde antes de continuar.");
       return;
     }
@@ -72,22 +76,18 @@ const SurveyScreen: React.FC<SurveyScreenProps> = ({ route }) => {
       setCurrentIndex(currentIndex + 1);
       setSelectedOption(responses[currentIndex + 1] || "");
     } else {
-      // Si ya estamos en la última pregunta
-      // const puntajeTotal = survey.calcularPuntaje
-      //   ? survey.calcularPuntaje(responses, edad, sexo)
-      //   : responses
-      //     .filter((r) => typeof r === "number")
-      //     .reduce((acc, val) => acc + val, 0);
-
-      const puntajeTotal = survey.calcularPuntaje
-        ? survey.calcularPuntaje(responses.map(r => r.valor), edad, sexo)
-        : responses.reduce((acc, r) => acc + (typeof r.valor === 'number' ? r.valor : 0), 0);
+      const puntajeTotal = responses.reduce((acc, r) => {
+        if (typeof r === 'object' && r.valor !== undefined) {
+          return acc + r.valor;
+        }
+        return acc;
+      }, 0);      
 
 
 
       navigation.navigate("SurveySummary", {
         surveyId,
-        responses: responses.map((r) => r.texto),
+        responses: responses.map((r) => (typeof r === "string" ? r : r.texto)),
         puntaje: puntajeTotal,
         edad,
         sexo,
@@ -112,15 +112,17 @@ const SurveyScreen: React.FC<SurveyScreenProps> = ({ route }) => {
 
   const handleResponseChange = (respuesta: string | { texto: string; valor: number }) => {
     const updated = [...responses];
-    if (typeof respuesta === "string") {
-      updated[currentIndex] = typeof respuesta === "string" ? { texto: respuesta, valor: 0 } : respuesta;
-      setSelectedOption(respuesta); // Para marcar la opción seleccionada
-    } else {
-      updated[currentIndex] = respuesta;
-      setSelectedOption(respuesta.valor); // Para marcar la opción seleccionada
-    }
+    updated[currentIndex] = respuesta;
     setResponses(updated);
+
+    if (typeof respuesta === 'string') {
+      setSelectedOption(respuesta); // para texto libre (ej: peso)
+    } else {
+      setSelectedOption(respuesta.valor); // para opciones con puntaje
+    }
   };
+
+
 
 
   const renderQuestion = () => {

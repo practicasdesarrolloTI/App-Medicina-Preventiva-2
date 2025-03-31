@@ -9,18 +9,28 @@ import Toast from 'react-native-toast-message';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SurveySummary'>;
 
-type Respuesta = {
-  texto: string;
-  valor: number;
-};
+type Respuesta =
+  | string
+  | number
+  | {
+    texto: string;
+    valor: number;
+  };
 
 const SurveySummary: React.FC<Props> = ({ route, navigation }) => {
   const { surveyId, puntaje, edad, sexo, survey } = route.params;
   const { responses } = route.params as unknown as { responses: Respuesta[] };
 
-  const estatura = parseFloat(responses[0].texto);
-  const peso = parseFloat(responses[1].texto);
+  const estaturaStr = responses[0] as string;
+  const pesoStr = responses[1] as string;
+
+  const estatura = parseFloat(estaturaStr);
+  const peso = parseFloat(pesoStr);
+
   const imc = peso && estatura ? peso / (estatura * estatura) : NaN;
+  console.log('IMC:', imc);
+
+
 
   const getRecomendacion = () => {
     if (!survey?.recomendaciones) return '';
@@ -55,7 +65,7 @@ const SurveySummary: React.FC<Props> = ({ route, navigation }) => {
         surveyId,
         patientId: storedPatientId,
         surveyName: survey.nombre,
-        responses: responses.map((r) => r.texto),
+        responses: responses.map((r) => (typeof r === 'object' && 'texto' in r ? r.texto : r)),
         puntaje,
         edad,
         sexo,
@@ -114,8 +124,8 @@ const SurveySummary: React.FC<Props> = ({ route, navigation }) => {
 
       <Text style={styles.label}>Respuestas:</Text>
       {responses.map((r, i) => (
-        <Text key={i} style={styles.response}>
-          • {r.texto} ({r.valor})
+        <Text key={i}>
+          {typeof r === 'object' ? `${r.texto} (${r.valor})` : r}
         </Text>
       ))}
 
