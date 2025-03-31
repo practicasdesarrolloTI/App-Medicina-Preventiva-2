@@ -9,11 +9,17 @@ import Toast from 'react-native-toast-message';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SurveySummary'>;
 
-const SurveySummary: React.FC<Props> = ({ route, navigation }) => {
-  const { surveyId, responses, puntaje, edad, sexo, survey } = route.params;
+type Respuesta = {
+  texto: string;
+  valor: number;
+};
 
-  const estatura = parseFloat(responses[0]);
-  const peso = parseFloat(responses[1]);
+const SurveySummary: React.FC<Props> = ({ route, navigation }) => {
+  const { surveyId, puntaje, edad, sexo, survey } = route.params;
+  const { responses } = route.params as unknown as { responses: Respuesta[] };
+
+  const estatura = parseFloat(responses[0].texto);
+  const peso = parseFloat(responses[1].texto);
   const imc = peso && estatura ? peso / (estatura * estatura) : NaN;
 
   const getRecomendacion = () => {
@@ -42,27 +48,27 @@ const SurveySummary: React.FC<Props> = ({ route, navigation }) => {
         Alert.alert('Error', 'No se encontró el documento del paciente.');
         return;
       }
-  
+
       const recomendacion = getRecomendacion();
-  
+
       const result = await submitSurveyResult({
         surveyId,
         patientId: storedPatientId,
         surveyName: survey.nombre,
-        responses,
+        responses: responses.map((r) => r.texto),
         puntaje,
         edad,
         sexo,
         recomendacion,
       });
-  
+
       if (result.error) {
         Toast.show({
           type: 'error',
           text1: 'Error',
           text2: result.error,
         });
-        
+
       } else {
         // Toast.show({
         //   type: 'success',
@@ -70,7 +76,7 @@ const SurveySummary: React.FC<Props> = ({ route, navigation }) => {
         //   text2: 'Resultado guardado correctamente',
         // });
         Toast.show({
-          type: 'customBlue',
+          type: 'success',
           text1: 'Éxito',
           text2: 'Resultado guardado correctamente',
           position: 'bottom',
@@ -101,10 +107,19 @@ const SurveySummary: React.FC<Props> = ({ route, navigation }) => {
         <Text style={styles.value}>{isNaN(imc) ? 'No disponible' : imc.toFixed(2)}</Text>
       </>
 
-      <Text style={styles.label}>Respuestas:</Text>
+      {/* <Text style={styles.label}>Respuestas:</Text>
       {responses.map((resp, idx) => (
         <Text key={idx} style={styles.response}>• {resp}</Text>
+      ))} */}
+
+      <Text style={styles.label}>Respuestas:</Text>
+      {responses.map((r, i) => (
+        <Text key={i} style={styles.response}>
+          • {r.texto} ({r.valor})
+        </Text>
       ))}
+
+
 
       <Text style={styles.label}>Puntaje Total:</Text>
       <Text style={styles.value}>{puntaje}</Text>

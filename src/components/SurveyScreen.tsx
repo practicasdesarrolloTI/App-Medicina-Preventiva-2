@@ -33,13 +33,18 @@ type Pregunta =
     omitida?: boolean;
   };
 
+  type Respuesta = {
+    texto: string;
+    valor: number;
+  };
+
 const SurveyScreen: React.FC<SurveyScreenProps> = ({ route }) => {
   const { preguntas, surveyId, edad, sexo, survey } = route.params;
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [responses, setResponses] = useState<any[]>([]);
+  const [responses, setResponses] = useState<Respuesta[]>([]);
   const [selectedOption, setSelectedOption] = useState<any>("");
 
   // 🔍 Filtrar preguntas omitidas
@@ -68,11 +73,16 @@ const SurveyScreen: React.FC<SurveyScreenProps> = ({ route }) => {
       setSelectedOption(responses[currentIndex + 1] || "");
     } else {
       // Si ya estamos en la última pregunta
+      // const puntajeTotal = survey.calcularPuntaje
+      //   ? survey.calcularPuntaje(responses, edad, sexo)
+      //   : responses
+      //     .filter((r) => typeof r === "number")
+      //     .reduce((acc, val) => acc + val, 0);
+
       const puntajeTotal = survey.calcularPuntaje
-        ? survey.calcularPuntaje(responses, edad, sexo)
-        : responses
-          .filter((r) => typeof r === "number")
-          .reduce((acc, val) => acc + val, 0);
+        ? survey.calcularPuntaje(responses.map(r => r.valor), edad, sexo)
+        : responses.reduce((acc, r) => acc + (typeof r.valor === 'number' ? r.valor : 0), 0);
+
 
 
       navigation.navigate("SurveySummary", {
@@ -93,12 +103,25 @@ const SurveyScreen: React.FC<SurveyScreenProps> = ({ route }) => {
     }
   };
 
-  const handleResponseChange = (respuesta: string | number) => {
+  // const handleResponseChange = (respuesta: string | number) => {
+  //   const updated = [...responses];
+  //   updated[currentIndex] = respuesta;
+  //   setResponses(updated);
+  //   setSelectedOption(respuesta);
+  // };
+
+  const handleResponseChange = (respuesta: string | { texto: string; valor: number }) => {
     const updated = [...responses];
-    updated[currentIndex] = respuesta;
+    if (typeof respuesta === "string") {
+      updated[currentIndex] = respuesta;
+      setSelectedOption(respuesta); // Para marcar la opción seleccionada
+    } else {
+      updated[currentIndex] = respuesta;
+      setSelectedOption(respuesta.valor); // Para marcar la opción seleccionada
+    }
     setResponses(updated);
-    setSelectedOption(respuesta);
   };
+
 
   const renderQuestion = () => {
     const currentQuestion = finalPreguntas[currentIndex];
@@ -135,7 +158,8 @@ const SurveyScreen: React.FC<SurveyScreenProps> = ({ route }) => {
                 styles.optionButton,
                 selectedOption === op.valor && styles.selectedOption,
               ]}
-              onPress={() => handleResponseChange(op.valor)}
+              // onPress={() => handleResponseChange(op.valor)}
+              onPress={() => handleResponseChange({ texto: op.texto, valor: op.valor })}
             >
               <Text style={styles.optionText}>{op.texto}</Text>
             </TouchableOpacity>
