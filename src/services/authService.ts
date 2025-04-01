@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Toast from 'react-native-toast-message';
 
 const API_URL = "http://10.0.2.2:5000/api/auth";
 
@@ -15,7 +16,11 @@ export const registerUser = async (documentType: DocumentType, document: number,
 
 
   } catch (error: any) {
-    console.error("Error en el registro:", error.message);
+    Toast.show({
+      type: "error",
+      text1: "Error en el Registro",
+      text2: error.message,
+    });
     return { success: false, message: error.message };
   }
 };
@@ -47,7 +52,11 @@ export const loginUser = async (document: number, password: string) => {
 
     return { success: true, data };
   } catch (error: any) {
-    console.error("Error en el login:", error.message);
+    Toast.show({
+      type: "error",
+      text1: "Error en el Login",
+      text2: error.message,
+    });
     return { success: false, message: error.message };
   }
 };

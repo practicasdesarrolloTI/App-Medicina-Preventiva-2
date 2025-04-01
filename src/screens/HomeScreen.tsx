@@ -4,6 +4,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigation';
 import { getToken, logoutUser } from "../services/authService";
 import styles from '../styles/HomeStyles';
+import Toast from "react-native-toast-message";
 
 // Definir el tipo de las props
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
@@ -22,6 +23,11 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
     const handleLogout = async () => {
         await logoutUser();
+        Toast.show({
+            type: 'success',
+            text1: 'Sesión cerrada',
+            text2: 'Has cerrado sesión correctamente.',
+        });
         navigation.replace("Login");
     };
 

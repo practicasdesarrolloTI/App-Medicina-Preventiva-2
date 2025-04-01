@@ -22,11 +22,60 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
   const [password, setPassword] = useState("");
   const [visible, setVisible] = useState(false);
   const [message, setMessage] = useState("");
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [isBlocked, setIsBlocked] = useState(false);
+
 
 
   const handleLogin = async () => {
+
+    if (isBlocked) {
+      Toast.show({
+        type: 'error',
+        text1: 'Acceso bloqueado',
+        text2: 'Has superado el límite de intentos. Intenta más tarde.',
+      });
+      setVisible(true);
+      return;
+    }
+
     if (!documentType || !document || !password) {
-      setMessage("Todos los campos son obligatorios");
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Todos los campos son obligatorios.',
+      });
+      setVisible(true);
+      return;
+    }
+
+
+    if (isBlocked) {
+      Toast.show({
+        type: 'error',
+        text1: 'Acceso bloqueado',
+        text2: 'Has superado el límite de intentos. Intenta más tarde.',
+      });
+      setVisible(true);
+      return;
+    }
+
+    
+    // const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{4,12}$/;
+    // if (!passwordRegex.test(password)) {
+    //   setMessage("La contraseña debe tener entre 4 y 12 caracteres, contener al menos una letra y un número, y no tener símbolos especiales.");
+    //   setVisible(true);
+    //   return;
+    // }
+
+    
+    const passwordRegex = /^[a-zA-Z0-9]{2,12}$/;
+    if (!passwordRegex.test(password)) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'La contraseña debe ser alfanumérica y tener entre 4 y 12 caracteres.',
+      });
       setVisible(true);
       return;
     }
@@ -36,16 +85,23 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
     await AsyncStorage.setItem('documento', document);
 
     if (!result.success) {
-      Toast.show({
-        type: 'error',
-        text1: 'Error al iniciar sesión',
-        text2: 'Por favor, revisa tus credenciales',
+      setFailedAttempts(prev => {
+        const newCount = prev + 1;
+        if (newCount >= 5) {
+          setIsBlocked(true);
+          Toast.show({
+            type: 'error',
+            text1: 'Acceso bloqueado',
+            text2: 'Has superado el límite de intentos.',
+          });
+        }
+        return newCount;
       });
     } else {
       Toast.show({
         type: 'success',
-        text1: '¡Registro exitoso!',
-        text2: 'Bienvenido a la app de Bienestar IPS',
+        text1: '¡Inicio de Sesión Exitoso!',
+        text2: 'Bienvenido!',
       });
       setTimeout(() => navigation.replace("Home"), 1000);
     }
@@ -63,7 +119,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
         onValueChange={(itemValue) => setDocumentType(itemValue)}
         style={styles.picker}
       >
-        <Picker.Item label="Seleccione Tipo de Documento" value="" style={{ color: colors.gray }}/>
+        <Picker.Item label="Seleccione Tipo de Documento" value="" style={{ color: colors.gray }} />
         <Picker.Item label="Cédula de Ciudadanía" value="CC" />
         <Picker.Item label="Cédula de Extranjería" value="CE" />
         <Picker.Item label="Pasaporte" value="PAS" />
@@ -71,7 +127,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
         <Picker.Item label="Registro Civil" value="RC" />
         <Picker.Item label="Número de Identidad" value="NI" />
       </Picker>
-      
+
 
 
       {/* 📌 Número de Documento */}

@@ -7,6 +7,7 @@ import styles from '../styles/RegisterStyles';
 import { Picker } from '@react-native-picker/picker';
 import { checkPatientExists } from '../services/patientService';
 import { getPatientByDocument } from '../services/patientService';
+import Toast from 'react-native-toast-message';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Register'>;
 
@@ -16,6 +17,9 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [passwordValid, setPasswordValid] = useState(true);
+  const [passwordsMatch, setPasswordsMatch] = useState(true);
+
 
   const handleRegister = async () => {
     if (!documentType || !document || !password || !confirmPassword) {
@@ -28,34 +32,61 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
       return;
     }
 
-    
+    // const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{4,12}$/; //debe contener al menos una letra y un número
+    // if (!passwordRegex.test(password)) {
+    //   Alert.alert("Error", "La contraseña debe tener entre 4 y 12 caracteres, contener al menos una letra y un número, y no tener símbolos especiales.");
+    //   return;
+    // }
+
+    const passwordRegex = /^[a-zA-Z0-9]{2,12}$/;
+    if (!passwordRegex.test(password)) {
+      Alert.alert("Error", "La contraseña debe ser alfanumérica y tener entre 4 y 12 caracteres.");
+      return;
+    }
+
 
     setLoading(true);
 
-  try {
-    const patient = await getPatientByDocument(document);
+    try {
+      const patient = await getPatientByDocument(document);
 
-    if (!patient) {
-      Alert.alert("Error", "Este número de documento no está inscrito en la EPS.");
-      return;
+      if (!patient) {
+        Toast.show({
+          type: 'error',
+          text1: '¡Registro fallido!',
+          text2: 'Este número de documento no está inscrito en la EPS.',
+        });
+        return;
+      }
+
+      if (patient.tipo_documento !== (documentType as unknown as string)) {
+        Toast.show({
+          type: 'error',
+          text1: '¡Registro fallido!',
+          text2: 'El tipo de documento no coincide.',
+        });
+        return;
+      }
+
+      await registerUser(documentType, Number(document), password);
+
+      Toast.show({
+        type: 'success',
+        text1: '¡Registro exitoso!',
+        text2: 'Bienvenido a la app de Bienestar IPS',
+      });
+      navigation.replace('Login');
+
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: '¡Registro fallido!',
+        text2: 'Error al registrar, intenta nuevamente.',
+      });
+    } finally {
+      setLoading(false);
     }
-
-    if (patient.tipo_documento !== (documentType as unknown as string)) {
-      Alert.alert("Error", `El tipo de documento no coincide.`);
-      return;
-    }
-    
-    await registerUser(documentType, Number(document), password);
-
-    Alert.alert("Registro exitoso", "Ya puedes iniciar sesión.");
-    navigation.replace('Login');
-
-  } catch (error) {
-    Alert.alert("Error", "Ocurrió un error durante el registro.");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   return (
     <View style={styles.container}>
@@ -92,8 +123,20 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
         placeholder="Contraseña"
         secureTextEntry
         value={password}
-        onChangeText={setPassword}
+        onChangeText={(text) => {
+          setPassword(text);
+          // const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{4,12}$/;
+          const regex = /^[a-zA-Z0-9]{2,12}$/; //debe contener al menos una letra y un número
+          setPasswordValid(regex.test(text));
+          setPasswordsMatch(text === confirmPassword);
+        }}
       />
+
+      {!passwordValid && password.length > 0 && (
+        <Text style={{ color: 'red', marginBottom: 8 }}>
+          La contraseña debe tener entre 4 y 12 caracteres, incluir al menos una letra y un número, y no contener símbolos.
+        </Text>
+      )}
 
       {/* 📌 Confirmar Contraseña */}
       <TextInput
@@ -101,14 +144,25 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
         placeholder="Confirmar Contraseña"
         secureTextEntry
         value={confirmPassword}
-        onChangeText={setConfirmPassword}
+        onChangeText={(text) => {
+          setConfirmPassword(text);
+          setPasswordsMatch(password === text);
+        }}
       />
+
+      {!passwordsMatch && confirmPassword.length > 0 && (
+        <Text style={{ color: 'red', marginBottom: 8 }}>
+          Las contraseñas no coinciden.
+        </Text>
+      )}
+
 
       {/* 📌 Botón de Registro */}
       <TouchableOpacity style={styles.button} onPress={handleRegister}>
         <Text style={styles.buttonText}>Registrarse</Text>
       </TouchableOpacity>
     </View>
+
   );
 };
 
