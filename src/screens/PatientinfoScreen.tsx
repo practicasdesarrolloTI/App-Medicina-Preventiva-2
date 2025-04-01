@@ -85,7 +85,7 @@ const PatientInfoScreen: React.FC<Props> = ({ navigation }) => {
         <Text style={styles.label}><Text style={styles.bold}>Código IPS:</Text> {paciente?.codigo_ips}</Text>
         <Text style={styles.label}><Text style={styles.bold}>Sexo:</Text> {paciente?.sexo === "M" ? "Masculino" : "Femenino"}</Text>
         <Text style={styles.label}><Text style={styles.bold}>Fecha de Nacimiento:</Text> {paciente?.fecha_nacimiento}</Text>
-        <Text style={styles.label}><Text style={styles.bold}>Edad:</Text> {paciente ? calcularEdad(paciente.fecha_nacimiento) : "No disponible"}</Text>
+        <Text style={styles.label}><Text style={styles.bold}>Edad:</Text> {paciente ? calcularEdad(paciente.fecha_nacimiento) : "No disponible"} años</Text>
         <Text style={styles.label}><Text style={styles.bold}>Celular:</Text> {paciente?.celular}</Text>
         <Text style={styles.label}><Text style={styles.bold}>Teléfono:</Text> {paciente?.telefono}</Text>
         <Text style={styles.label}><Text style={styles.bold}>Correo:</Text> {paciente?.correo}</Text>

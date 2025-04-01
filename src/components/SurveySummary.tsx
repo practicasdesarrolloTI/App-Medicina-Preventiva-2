@@ -28,7 +28,6 @@ const SurveySummary: React.FC<Props> = ({ route, navigation }) => {
   const peso = parseFloat(pesoStr);
 
   const imc = peso && estatura ? peso / (estatura * estatura) : NaN;
-  console.log('IMC:', imc);
 
 
 
@@ -40,16 +39,6 @@ const SurveySummary: React.FC<Props> = ({ route, navigation }) => {
     });
     return recomendacion?.texto || 'No se encontró recomendación.';
   };
-
-  // const handleSubmit = async () => {
-  //   const result = await submitSurvey(surveyId, responses);
-  //   if (result.error) {
-  //     Alert.alert("Error", result.error);
-  //   } else {
-  //     Alert.alert("Éxito", "Encuesta enviada correctamente");
-  //     navigation.navigate("Home");
-  //   }
-  // };
 
   const handleSubmit = async () => {
     try {
@@ -65,7 +54,7 @@ const SurveySummary: React.FC<Props> = ({ route, navigation }) => {
         surveyId,
         patientId: storedPatientId,
         surveyName: survey.nombre,
-        responses: responses.map((r) => (typeof r === 'object' && 'texto' in r ? r.texto : r)),
+        responses: responses.map((r) => (typeof r === 'object' && 'texto' in r ? r.texto : String(r))),
         puntaje,
         edad,
         sexo,
@@ -80,16 +69,11 @@ const SurveySummary: React.FC<Props> = ({ route, navigation }) => {
         });
 
       } else {
-        // Toast.show({
-        //   type: 'success',
-        //   text1: 'Éxito Resultado guardado con éxito',
-        //   text2: 'Resultado guardado correctamente',
-        // });
         Toast.show({
           type: 'success',
           text1: 'Éxito',
           text2: 'Resultado guardado correctamente',
-          position: 'bottom',
+          position: 'top',
           visibilityTime: 5000,
         });
         navigation.navigate('Home');
@@ -117,10 +101,6 @@ const SurveySummary: React.FC<Props> = ({ route, navigation }) => {
         <Text style={styles.value}>{isNaN(imc) ? 'No disponible' : imc.toFixed(2)}</Text>
       </>
 
-      {/* <Text style={styles.label}>Respuestas:</Text>
-      {responses.map((resp, idx) => (
-        <Text key={idx} style={styles.response}>• {resp}</Text>
-      ))} */}
 
       <Text style={styles.label}>Respuestas:</Text>
       {responses.map((r, i) => (

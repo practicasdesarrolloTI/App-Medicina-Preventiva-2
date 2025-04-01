@@ -5,6 +5,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/AppNavigation";
 import { loginUser } from "../services/authService";
 import styles from "../styles/AuthStyles";
+import Toast from "react-native-toast-message";
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from "@react-native-picker/picker";
@@ -35,11 +36,17 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
     await AsyncStorage.setItem('documento', document);
 
     if (!result.success) {
-      setMessage(result.message);
-      setVisible(true);
+      Toast.show({
+        type: 'error',
+        text1: 'Error al iniciar sesión',
+        text2: 'Por favor, revisa tus credenciales',
+      });
     } else {
-      setMessage("Inicio de sesión exitoso");
-      setVisible(true);
+      Toast.show({
+        type: 'success',
+        text1: '¡Registro exitoso!',
+        text2: 'Bienvenido a la app de Bienestar IPS',
+      });
       setTimeout(() => navigation.replace("Home"), 1000);
     }
   };
