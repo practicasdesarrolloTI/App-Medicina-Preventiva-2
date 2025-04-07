@@ -18,13 +18,9 @@ const ForgotPasswordScreen = ({ navigation }: { navigation: ForgotPasswordScreen
       const patient = await getPatientByDocument(document);
       if (!patient) return Alert.alert("Error", "Paciente no encontrado.");
 
-      console.log("Paciente encontrado:", patient); // Verifica si el paciente se encuentra correctamente
       const correo = "christiandj456@outlook.com"; // ajusta al campo real de la respuesta
       setEmail(correo);
 
-      console.log("Correo electrónico:", correo); // Verifica si el correo se obtiene correctamente
-
-      console.log("Código de recuperación enviado al correo:", correo, "Voy a entrar a la función de envío de código", document); // Verifica que se llama a la función de envío de código
       
       await sendRecoveryCode(Number(document), correo);
 

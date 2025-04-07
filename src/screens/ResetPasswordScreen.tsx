@@ -22,10 +22,6 @@ const ResetPasswordScreen = ({ route, navigation }: Props) => {
       return Alert.alert("Error", "Las contraseñas no coinciden.");
     }
 
-    // const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{4,12}$/;
-    // if (!regex.test(password)) {
-    //   return Alert.alert("Error", "Contraseña inválida: entre 4 y 12 caracteres, con al menos una letra y un número.");
-    // }
 
     try {
       await resetPassword(Number(document), code, password);
