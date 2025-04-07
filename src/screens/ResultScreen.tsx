@@ -1,5 +1,9 @@
+
+// Link Anralab para consultar resultados de laboratorio
+// https://resultadoslaboratorio.bienestarips.com:8443/resultados/#nbb
+
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
+import { View, Text, FlatList, TouchableOpacity, Alert, ActivityIndicator, Linking } from "react-native";
 import { MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
 import styles from "../styles/ResultStyles";
 import { fetchResults } from '../services/resultService';
@@ -20,6 +24,7 @@ const ResultScreen = ({ navigation }: any) => {
   const [resultados, setResultados] = useState<Resultado[]>([]);
 
   const [loading, setLoading] = useState(true); // Estado de carga
+
 
   useEffect(() => {
     const loadData = async () => {
@@ -85,6 +90,13 @@ const ResultScreen = ({ navigation }: any) => {
       ) : (
       <Text style={styles.errorText}>No se pudo cargar la información de sus Resultados</Text>
     )}
+  
+    {/* Boton para consultar resultados en la web */}
+    <TouchableOpacity style={styles.webButton} onPress={() => Linking.openURL("https://resultadoslaboratorio.bienestarips.com:8443/resultados/#nbb")}>
+    
+      <Text style={styles.webButtonText}>Consultar Resultados en la Web</Text>
+    </TouchableOpacity>
+    
     </View>
   );
 };

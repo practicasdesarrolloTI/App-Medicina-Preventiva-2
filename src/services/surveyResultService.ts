@@ -11,7 +11,9 @@ type SurveyResultResponse = {
 
 export const submitSurveyResult = async ({
   surveyId,
+  patientTypeId,
   patientId,
+  patientName,
   surveyName,
   responses,
   puntaje,
@@ -20,7 +22,9 @@ export const submitSurveyResult = async ({
   recomendacion,
 }: {
   surveyId: string;
+  patientTypeId: string;
   patientId: string;
+  patientName: string;
   surveyName: string;
   responses: string[];
   puntaje: number;
@@ -39,7 +43,9 @@ export const submitSurveyResult = async ({
       API_URL,
       {
         surveyId,
+        patientTypeId,
         patientId,
+        patientName,
         surveyName,
         responses,
         puntaje,

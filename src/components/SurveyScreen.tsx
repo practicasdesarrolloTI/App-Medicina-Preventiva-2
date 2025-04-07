@@ -56,7 +56,7 @@ const SurveyScreen: React.FC<SurveyScreenProps> = ({ route }) => {
     return !q.omitida;
   });
 
-  // ✅ Insertar preguntas de estatura/peso si se requiere IMC
+  // Insertar preguntas de estatura/peso si se requiere IMC
   if (survey.requiredIMC) {
     finalPreguntas = [
       { pregunta: "¿Cuál es tu estatura en metros?", opciones: [], omitida: false },
@@ -103,12 +103,6 @@ const SurveyScreen: React.FC<SurveyScreenProps> = ({ route }) => {
     }
   };
 
-  // const handleResponseChange = (respuesta: string | number) => {
-  //   const updated = [...responses];
-  //   updated[currentIndex] = respuesta;
-  //   setResponses(updated);
-  //   setSelectedOption(respuesta);
-  // };
 
   const handleResponseChange = (respuesta: string | { texto: string; valor: number }) => {
     const updated = [...responses];

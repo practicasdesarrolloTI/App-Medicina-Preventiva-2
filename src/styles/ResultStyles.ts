@@ -93,6 +93,18 @@ const styles = StyleSheet.create({
       color: "red",
       marginTop: 20,
     },
-  });
+    webButton: {
+      backgroundColor: Colors.primary,
+      padding: 15,
+      borderRadius: 8,
+      alignItems: "center",
+      justifyContent: "center",
+      marginTop: 20,
+    },
+    webButtonText: {
+      color: "white",
+      fontSize: 16,
+    },
+    });
 
   export default styles;

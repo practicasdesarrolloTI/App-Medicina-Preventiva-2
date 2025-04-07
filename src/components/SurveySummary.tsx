@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigation';
@@ -6,6 +6,7 @@ import colors from '../themes/colors';
 import { submitSurveyResult } from '../services/surveyResultService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
+import { getPatientByDocument } from '../services/patientService';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SurveySummary'>;
 
@@ -17,9 +18,27 @@ type Respuesta =
     valor: number;
   };
 
+  type Paciente = {
+    primer_nombre: string;
+    segundo_nombre?: string;
+    primer_apellido: string;
+    segundo_apellido?: string;
+    tipo_documento: string;
+    documento: string;
+    fecha_nacimiento: string;
+    codigo_ips: number;
+    sexo: string;
+    celular: number;
+    telefono: number;
+    correo: string;
+    eps: string;
+    iat: number;
+  };
+
 const SurveySummary: React.FC<Props> = ({ route, navigation }) => {
   const { surveyId, puntaje, edad, sexo, survey } = route.params;
   const { responses } = route.params as unknown as { responses: Respuesta[] };
+   const [paciente, setPaciente] = useState<Paciente | null>(null);
 
   const estaturaStr = responses[0] as string;
   const pesoStr = responses[1] as string;
@@ -39,20 +58,32 @@ const SurveySummary: React.FC<Props> = ({ route, navigation }) => {
     });
     return recomendacion?.texto || 'No se encontró recomendación.';
   };
+  
 
   const handleSubmit = async () => {
     try {
-      const storedPatientId = await AsyncStorage.getItem('documento');
-      if (!storedPatientId) {
-        Alert.alert('Error', 'No se encontró el documento del paciente.');
-        return;
-      }
+      const loadPatient = async () => {
+          const storedDoc = await AsyncStorage.getItem('documento');
+          if (!storedDoc) {
+            Alert.alert("Error", "No se encontró el documento del paciente.");
+            return null;
+          }
+    
+          const data = await getPatientByDocument(storedDoc);
+          setPaciente(data as unknown as Paciente);
+          return data;
+        };
+        
+      const storedDoc = await loadPatient();
+      if (!storedDoc) return;
 
       const recomendacion = getRecomendacion();
 
       const result = await submitSurveyResult({
         surveyId,
-        patientId: storedPatientId,
+        patientTypeId: storedDoc.tipo_documento ?? '',
+        patientId: storedDoc.documento,
+        patientName: `${storedDoc.primer_nombre} ${storedDoc.segundo_nombre || ''} ${storedDoc.primer_apellido} ${storedDoc.segundo_apellido || ''}`,
         surveyName: survey.nombre,
         responses: responses.map((r) => (typeof r === 'object' && 'texto' in r ? r.texto : String(r))),
         puntaje,
