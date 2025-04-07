@@ -12,6 +12,9 @@ import Medicamentos from '../screens/MedicamentScreen';
 import Autocuidado from '../screens/SelfCareScreen';
 import SurveyScreen from "../components/SurveyScreen";
 import SurveySummary from "../components/SurveySummary";
+import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
+import VerifyCodeScreen from '../screens/VerifyCodeScreen';
+import ResetPasswordScreen from '../screens/ResetPasswordScreen';
 
 
 export type RootStackParamList = {
@@ -25,6 +28,9 @@ export type RootStackParamList = {
   TusCitas: undefined;
   Medicamentos: undefined;
   Autocuidado: undefined;
+  ForgotPassword: undefined;
+  VerifyCode: { document: string };
+  ResetPassword: { document: string; code: string };
   SurveySummary: {
     surveyId: string;
     responses: string[];
@@ -99,6 +105,9 @@ const AppNavigation: React.FC = () => {
         <Stack.Screen name="Autocuidado" component={Autocuidado} />
         <Stack.Screen name="SurveyScreen" component={SurveyScreen} />
         <Stack.Screen name="SurveySummary" component={SurveySummary} />
+        <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+        <Stack.Screen name="VerifyCode" component={VerifyCodeScreen} />
+        <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

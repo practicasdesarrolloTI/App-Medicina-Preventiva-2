@@ -159,6 +159,10 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
         <Text style={styles.link}>¿No tienes cuenta? Regístrate</Text>
       </Button>
 
+      <Button onPress={() => navigation.navigate('ForgotPassword')}>
+        <Text style={styles.link}>¿Olvidaste tu contraseña?</Text>
+      </Button>
+
       {/* 📌 Mensaje de error/exito con Snackbar */}
       <Snackbar visible={visible} onDismiss={() => setVisible(false)} duration={2000}>
         {message}

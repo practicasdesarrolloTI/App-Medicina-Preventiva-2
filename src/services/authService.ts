@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
+import axios from 'axios';
 
 const API_URL = "http://10.0.2.2:5000/api/auth";
 
@@ -80,4 +81,20 @@ export const getToken = async () => {
     console.error("Error al obtener el token:", error);
     return null;
   }
+};
+
+export const sendRecoveryCode = async (document: number, email: string) => {
+  return await axios.post(`${API_URL}/send-recovery-code`, { document, email });
+};
+
+export const verifyRecoveryCode = async (document: number, code: string) => {
+  return await axios.post(`${API_URL}/verify-code`, { document, code });
+};
+
+export const resetPassword = async (document: number, code: string, newPassword: string) => {
+  return await axios.post(`${API_URL}/reset-password`, {
+    document,
+    code,
+    newPassword
+  });
 };
