@@ -67,3 +67,13 @@ export const submitSurveyResult = async ({
     };
   }
 };
+
+export const getSurveyResultsByDocument = async (documento: string) => {
+  const token = await AsyncStorage.getItem('token');
+  const response = await axios.get(`${API_URL}/${documento}`, {
+    headers: {
+      Authorization: token || '',
+    },
+  });
+  return response.data;
+};

@@ -18,8 +18,27 @@ import { framinghamSurvey } from "../data/fragmiganSurvey";
 import { getPatientByDocument } from "../services/patientService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { calcularEdad } from '../utils/dateUtils';
+import { getSurveyResultsByDocument } from '../services/surveyResultService';
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+dayjs.extend(duration);
+import SurveyCard from "../components/SurveyCard";
 
 
+type ResultadoEncuesta = {
+  surveyId: string;
+  date: string; // en formato ISO
+};
+
+type EncuestaConEstado = Survey & {
+  bloqueada?: boolean;
+  mesesRestantes?: number;
+  disponibleEn?: {
+    meses: number;
+    dias: number;
+    horas: number;
+  };
+};
 
 type Survey = {
   id: string;
@@ -46,7 +65,52 @@ type Paciente = {
 const SelfCareScreen: React.FC = () => {
   const [paciente, setPaciente] = useState<Paciente | null>(null);
   const navigation = useNavigation<NavigationProp>();
-  //const [encuestas, setEncuestas] = useState<Survey[]>([]); // Inicializa el estado de encuestas como un array vacío si se quieren obtener de la API
+  const [resultados, setResultados] = useState<ResultadoEncuesta[]>([]);
+  const [encuestas, setEncuestas] = useState<Survey[]>([
+    { ...findriscSurvey, requiereEdad: true, requiereSexo: true, requiredIMC: true },
+    { ...lawtonBrodySurvey, requiereEdad: false, requiereSexo: false, requiredIMC: false },
+    { ...framinghamSurvey, requiereEdad: true, requiereSexo: true, requiredIMC: false },
+  ]);
+  const [encuestasConEstado, setEncuestasConEstado] = useState<EncuestaConEstado[]>([]);
+
+  const actualizarEncuestasConEstado = () => {
+    const ahora = dayjs();
+    const encuestasActualizadas = encuestas.map((encuesta) => {
+      const resultado = resultados.find(r => r.surveyId === encuesta.id);
+      if (resultado) {
+        const fecha = dayjs(resultado.date);
+        const expiracion = fecha.add(6, 'month');
+        const diferenciaMs = expiracion.diff(ahora);
+
+        if (diferenciaMs > 0) {
+          const duracion = dayjs.duration(diferenciaMs);
+          return {
+            ...encuesta,
+            bloqueada: true,
+            disponibleEn: {
+              meses: duracion.months(),
+              dias: duracion.days(),
+              horas: duracion.hours(),
+            },
+          };
+        }
+      }
+      return encuesta;
+    });
+    setEncuestasConEstado(encuestasActualizadas);
+  };
+
+
+  const loadResultados = async () => {
+    const storedDoc = await AsyncStorage.getItem('documento');
+    if (!storedDoc) return;
+    try {
+      const data = await getSurveyResultsByDocument(storedDoc);
+      setResultados(data as ResultadoEncuesta[]);
+    } catch (error) {
+      console.log("Error al obtener resultados previos:", error);
+    }
+  };
 
   const loadPatient = async () => {
     try {
@@ -64,32 +128,35 @@ const SelfCareScreen: React.FC = () => {
   };
 
 
-  // const cargarEncuestas = async () => {
-  //   try {
-  //     const data = await fetchAllSurveys();
-  //     setEncuestas(data as Survey[]); // usa setEncuestas correctamente
-  //   } catch (error) {
-  //     Alert.alert('Error', 'No se pudieron cargar las encuestas');
-  //   }
-  // };
-
-
   useEffect(() => {
     loadPatient();
-    //cargarEncuestas();
+    loadResultados();
   }, []);
 
-
-  const [encuestas, setEncuestas] = useState<Survey[]>([
-    { ...findriscSurvey, requiereEdad: true, requiereSexo: true, requiredIMC: true },
-    { ...lawtonBrodySurvey, requiereEdad: false, requiereSexo: false, requiredIMC: false },
-    { ...framinghamSurvey, requiereEdad: true, requiereSexo: true, requiredIMC: false },
-  ]);
-
+  useEffect(() => {
+    if (encuestas.length && resultados.length) {
+      actualizarEncuestasConEstado();
+    }
+  }, [encuestas, resultados]);
 
 
   const handleOpenSurvey = (survey: Survey) => {
     if (!paciente) return;
+
+    const resultado = resultados.find(r => r.surveyId === survey.id);
+    if (resultado) {
+      const fechaRespuesta = dayjs(resultado.date);
+      const ahora = dayjs();
+      const diferencia = ahora.diff(fechaRespuesta, 'month');
+
+      if (diferencia < 6) {
+        Alert.alert(
+          'Encuesta bloqueada',
+          `Ya realizaste esta encuesta hace menos de 6 meses. Inténtalo después de ${6 - diferencia} mes(es).`
+        );
+        return;
+      }
+    }
 
     const edad = calcularEdad(paciente.fecha_nacimiento);
     const sexo = paciente.sexo === 'M' ? 'Masculino' : 'Femenino';
@@ -99,7 +166,7 @@ const SelfCareScreen: React.FC = () => {
       preguntas: survey.preguntas,
       edad,
       sexo,
-      survey, 
+      survey,
     });
   };
 
@@ -115,21 +182,17 @@ const SelfCareScreen: React.FC = () => {
       </View>
 
       <FlatList
-        data={encuestas}
+        data={encuestasConEstado}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.card}
+          <SurveyCard
+            survey={{
+              ...item,
+              disponibleEn: item.bloqueada ? item.disponibleEn : undefined
+            }}
             onPress={() => handleOpenSurvey(item)}
-          >
-            <Text style={styles.title}>{item.nombre}</Text>
-            <Text style={styles.description}>{item.descripcion}</Text>
-            <MaterialIcons
-              name="arrow-forward"
-              size={24}
-              color={colors.primary}
-            />
-          </TouchableOpacity>
+          />
+
         )}
       />
     </View>
