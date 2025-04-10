@@ -77,7 +77,6 @@ const CustomToast = ({ type, text1, text2 }: ToastProps) => {
           activeOpacity={0.6}
           onPress={() => Toast.hide()}
         >
-          <Text style={[styles.button, { color: textColorMap[type] }]}>Entendido</Text>
         </TouchableOpacity>
       </View>
     </Animated.View>

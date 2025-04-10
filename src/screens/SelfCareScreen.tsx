@@ -23,21 +23,14 @@ import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 dayjs.extend(duration);
 import SurveyCard from "../components/SurveyCard";
+import { ActivityIndicator } from "react-native-paper";
+import { getRemainingTime } from "../utils/getRemainingTimeUtils";
 
 
 type ResultadoEncuesta = {
   surveyId: string;
-  date: string; // en formato ISO
-};
-
-type EncuestaConEstado = Survey & {
-  bloqueada?: boolean;
-  mesesRestantes?: number;
-  disponibleEn?: {
-    meses: number;
-    dias: number;
-    horas: number;
-  };
+  createdAt: string;
+  updatedAt: string;
 };
 
 type Survey = {
@@ -71,34 +64,8 @@ const SelfCareScreen: React.FC = () => {
     { ...lawtonBrodySurvey, requiereEdad: false, requiereSexo: false, requiredIMC: false },
     { ...framinghamSurvey, requiereEdad: true, requiereSexo: true, requiredIMC: false },
   ]);
-  const [encuestasConEstado, setEncuestasConEstado] = useState<EncuestaConEstado[]>([]);
-
-  const actualizarEncuestasConEstado = () => {
-    const ahora = dayjs();
-    const encuestasActualizadas = encuestas.map((encuesta) => {
-      const resultado = resultados.find(r => r.surveyId === encuesta.id);
-      if (resultado) {
-        const fecha = dayjs(resultado.date);
-        const expiracion = fecha.add(6, 'month');
-        const diferenciaMs = expiracion.diff(ahora);
-
-        if (diferenciaMs > 0) {
-          const duracion = dayjs.duration(diferenciaMs);
-          return {
-            ...encuesta,
-            bloqueada: true,
-            disponibleEn: {
-              meses: duracion.months(),
-              dias: duracion.days(),
-              horas: duracion.hours(),
-            },
-          };
-        }
-      }
-      return encuesta;
-    });
-    setEncuestasConEstado(encuestasActualizadas);
-  };
+  const [loading, setLoading] = useState(true);
+  const [estadoEncuestas, setEstadoEncuestas] = useState<Record<string, any>>({});
 
 
   const loadResultados = async () => {
@@ -106,9 +73,12 @@ const SelfCareScreen: React.FC = () => {
     if (!storedDoc) return;
     try {
       const data = await getSurveyResultsByDocument(storedDoc);
+
       setResultados(data as ResultadoEncuesta[]);
     } catch (error) {
       console.log("Error al obtener resultados previos:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -133,29 +103,56 @@ const SelfCareScreen: React.FC = () => {
     loadResultados();
   }, []);
 
+
   useEffect(() => {
-    if (encuestas.length && resultados.length) {
-      actualizarEncuestasConEstado();
-    }
+    if (!encuestas.length) return;
+
+    const intervalo = setInterval(() => {
+      const nuevosEstados: Record<string, any> = {};
+
+      encuestas.forEach((encuesta) => {
+        const resultado = resultados.find((r) => r.surveyId === encuesta.id);
+
+        if (!resultado) {
+          nuevosEstados[encuesta.id] = { bloqueada: false };
+        } else {
+          const fechaEncuesta = resultado.createdAt;
+          if (!fechaEncuesta) return;
+          const tiempoRestante = getRemainingTime(fechaEncuesta);
+
+          const completado = tiempoRestante.completado;
+
+          nuevosEstados[encuesta.id] = {
+            bloqueada: !completado,
+            disponibleEn: tiempoRestante,
+          };
+        }
+      });
+
+      setEstadoEncuestas(nuevosEstados);
+    }, 1000);
+
+    return () => clearInterval(intervalo);
   }, [encuestas, resultados]);
+
+
 
 
   const handleOpenSurvey = (survey: Survey) => {
     if (!paciente) return;
 
-    const resultado = resultados.find(r => r.surveyId === survey.id);
-    if (resultado) {
-      const fechaRespuesta = dayjs(resultado.date);
-      const ahora = dayjs();
-      const diferencia = ahora.diff(fechaRespuesta, 'month');
+    const resultado = resultados.find((r) => r.surveyId === survey.id);
+    const estado = estadoEncuestas[survey.id];
 
-      if (diferencia < 6) {
-        Alert.alert(
-          'Encuesta bloqueada',
-          `Ya realizaste esta encuesta hace menos de 6 meses. Inténtalo después de ${6 - diferencia} mes(es).`
-        );
-        return;
-      }
+    if (estado?.bloqueada) {
+      const { meses, dias, horas } = estado?.disponibleEn || {};
+      const partes: string[] = [];
+      if (meses > 0) partes.push(`${meses} mes${meses > 1 ? "es" : ""}`);
+      if (dias > 0) partes.push(`${dias} día${dias > 1 ? "s" : ""}`);
+      if (horas > 0) partes.push(`${horas} hora${horas > 1 ? "s" : ""}`);
+
+      Alert.alert("Encuesta bloqueada", `Podrás volver a realizar esta encuesta en ${partes.join(" y ")}.`);
+      return;
     }
 
     const edad = calcularEdad(paciente.fecha_nacimiento);
@@ -170,7 +167,22 @@ const SelfCareScreen: React.FC = () => {
     });
   };
 
+  const renderSurvey = (survey: Survey) => {
+    const estado = estadoEncuestas[survey.id] || { bloqueada: false };
 
+    return (
+      <SurveyCard
+        key={survey.id}
+        survey={{
+          nombre: survey.nombre,
+          descripcion: survey.descripcion,
+          bloqueada: estado.bloqueada,
+        }}
+        tiempoRestante={estado.disponibleEn}
+        onPress={() => handleOpenSurvey(survey)}
+      />
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -181,20 +193,15 @@ const SelfCareScreen: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      <FlatList
-        data={encuestasConEstado}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <SurveyCard
-            survey={{
-              ...item,
-              disponibleEn: item.bloqueada ? item.disponibleEn : undefined
-            }}
-            onPress={() => handleOpenSurvey(item)}
-          />
-
-        )}
-      />
+      {loading ? (
+        <ActivityIndicator size="large" color={styles.title.color} />
+      ) : (
+        <FlatList
+          data={encuestas}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => renderSurvey(item)}
+        />
+      )}
     </View>
   );
 };

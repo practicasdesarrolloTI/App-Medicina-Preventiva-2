@@ -1,65 +1,48 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Modal } from "react-native";
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Modal,
+} from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import colors from "../themes/colors";
-import dayjs from "dayjs";
-import duration from "dayjs/plugin/duration";
-
-dayjs.extend(duration);
 
 type Props = {
   survey: {
     nombre: string;
     descripcion: string;
     bloqueada?: boolean;
-    disponibleEn?: {
-      meses: number;
-      dias: number;
-      horas: number;
-    };
+  };
+  tiempoRestante?: {
+    porcentajeCompletado: number;
+    meses: number;
+    dias: number;
+    horas: number;
+    minutos?: number;
+    segundos: number;
   };
   onPress: () => void;
 };
 
-const SurveyCard: React.FC<Props> = ({ survey, onPress }) => {
+const SurveyCard: React.FC<Props> = ({ survey, tiempoRestante, onPress }) => {
   const [showModal, setShowModal] = useState(false);
-  const [tiempoRestante, setTiempoRestante] = useState(survey.disponibleEn);
-
-  useEffect(() => {
-    if (!survey.bloqueada || !survey.disponibleEn) return;
-
-    const interval = setInterval(() => {
-      const totalMs =
-        (survey.disponibleEn?.meses || 0) * 30 * 24 * 60 * 60 * 1000 +
-        (survey.disponibleEn?.dias || 0) * 24 * 60 * 60 * 1000 +
-        (survey.disponibleEn?.horas || 0) * 60 * 60 * 1000;
-
-      const targetDate = dayjs().add(totalMs, "milliseconds");
-      const diff = targetDate.diff(dayjs());
-      const duracion = dayjs.duration(diff);
-
-      setTiempoRestante({
-        meses: duracion.months(),
-        dias: duracion.days(),
-        horas: duracion.hours(),
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [survey]);
 
   const getTiempoDisponibleEn = () => {
     if (!tiempoRestante) return "";
 
     const partes = [];
-    if (tiempoRestante.meses > 0) {
+    if (tiempoRestante.meses > 0)
       partes.push(`${tiempoRestante.meses} mes${tiempoRestante.meses === 1 ? "" : "es"}`);
-    }
-    if (tiempoRestante.dias > 0) {
+    if (tiempoRestante.dias > 0)
       partes.push(`${tiempoRestante.dias} día${tiempoRestante.dias === 1 ? "" : "s"}`);
-    }
-    if (tiempoRestante.horas > 0) {
+    if (tiempoRestante.horas > 0)
       partes.push(`${tiempoRestante.horas} hora${tiempoRestante.horas === 1 ? "" : "s"}`);
+    if (tiempoRestante.minutos && tiempoRestante.minutos > 0)
+      partes.push(`${tiempoRestante.minutos} min`);
+    if (tiempoRestante.segundos > 0) {
+      partes.push(`${tiempoRestante.segundos} segundo${tiempoRestante.segundos === 1 ? "" : "s"}`);
     }
 
     return partes.join(", ");
@@ -89,9 +72,23 @@ const SurveyCard: React.FC<Props> = ({ survey, onPress }) => {
         <Text style={styles.description}>{survey.descripcion}</Text>
 
         {survey.bloqueada ? (
-          <Text style={styles.disabledText}>
-            Disponible en {getTiempoDisponibleEn()}
-          </Text>
+          <>
+            <Text style={styles.disabledText}>
+              Disponible en {getTiempoDisponibleEn()}
+            </Text>
+
+            {/* Barra de progreso visual */}
+            {tiempoRestante && (
+              <View style={styles.progressBarBackground}>
+                <View
+                  style={[
+                    styles.progressBarFill,
+                    { width: tiempoRestante.porcentajeCompletado * 100 },
+                  ]}
+                />
+              </View>
+            )}
+          </>
         ) : (
           <View style={styles.startButton}>
             <Text style={styles.buttonText}>Iniciar</Text>
@@ -107,6 +104,19 @@ const SurveyCard: React.FC<Props> = ({ survey, onPress }) => {
               Esta encuesta ya fue completada. Podrás volver a realizarla en{" "}
               {getTiempoDisponibleEn()}.
             </Text>
+
+            {/* Barra de progreso fuera del <Text> */}
+            {survey.bloqueada && tiempoRestante && (
+              <View style={styles.progressBarBackground}>
+                <View
+                  style={[
+                    styles.progressBarFill,
+                    { width: tiempoRestante.porcentajeCompletado * 100 },
+                  ]}
+                />
+              </View>
+            )}
+
             <TouchableOpacity
               style={styles.modalButton}
               onPress={() => setShowModal(false)}
@@ -194,6 +204,19 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 16,
   },
+  progressBarBackground: {
+    width: '100%',
+    height: 8,
+    backgroundColor: '#ccc',
+    borderRadius: 4,
+    marginTop: 8,
+  },
+  progressBarFill: {
+    height: 8,
+    backgroundColor: colors.primary,
+    borderRadius: 4,
+  },
+
 });
 
 export default SurveyCard;

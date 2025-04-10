@@ -13,8 +13,8 @@ const App: React.FC = () => {
       <AppNavigation />
       <Toast
         position="top"
-        visibilityTime={5000}
-        autoHide={false}
+        visibilityTime={1500}
+        autoHide={true}
         config={{
           success: (props) => <CustomToast {...{ ...props, text1: props.text1 || "Default success message" }} type="success" />,
           error: (props) => <CustomToast {...{ ...props, text1: props.text1 || "Default error message" }} type="error" />,
