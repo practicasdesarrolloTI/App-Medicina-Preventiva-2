@@ -97,6 +97,7 @@ const SurveySummary: React.FC<Props> = ({ route, navigation }) => {
           type: 'error',
           text1: 'Error',
           text2: result.error,
+          position: 'bottom',
         });
 
       } else {
@@ -104,7 +105,7 @@ const SurveySummary: React.FC<Props> = ({ route, navigation }) => {
           type: 'success',
           text1: 'Éxito',
           text2: 'Resultado guardado correctamente',
-          position: 'top',
+          position: 'bottom',
           visibilityTime: 5000,
         });
         navigation.navigate('Home');
