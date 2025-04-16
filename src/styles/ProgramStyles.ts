@@ -91,6 +91,11 @@ const styles = StyleSheet.create({
     color: "red",
     marginTop: 20,
   },
+  empty: {
+    textAlign: 'center',
+    fontSize: 16,
+    color: '#666',
+  }
 });
 
 export default styles;

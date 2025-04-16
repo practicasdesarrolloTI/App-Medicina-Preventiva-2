@@ -5,7 +5,6 @@ import { RootStackParamList } from '../navigation/AppNavigation';
 import { registerUser } from '../services/authService';
 import styles from '../styles/RegisterStyles';
 import { Picker } from '@react-native-picker/picker';
-import { checkPatientExists } from '../services/patientService';
 import { getPatientByDocument } from '../services/patientService';
 import Toast from 'react-native-toast-message';
 
@@ -59,7 +58,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
         return;
       }
 
-      if (patient.tipo_documento !== (documentType as unknown as string)) {
+      if (patient.tipo_documento_abreviado !== (documentType as unknown as string)) {
         Toast.show({
           type: 'error',
           text1: '¡Registro fallido!',

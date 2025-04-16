@@ -6,7 +6,6 @@ import { RootStackParamList } from "../navigation/AppNavigation";
 import { loginUser } from "../services/authService";
 import styles from "../styles/AuthStyles";
 import Toast from "react-native-toast-message";
-
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from "@react-native-picker/picker";
 import colors from "../themes/colors";
@@ -80,9 +79,10 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
       return;
     }
 
-    const result = await loginUser(Number(document), password);
+    const result = await loginUser(documentType, Number(document), password);
 
     await AsyncStorage.setItem('documento', document);
+    await AsyncStorage.setItem('tipoDocumento', String(documentType));
 
     if (!result.success) {
       setFailedAttempts(prev => {

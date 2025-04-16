@@ -33,14 +33,14 @@ export const registerUser = async (documentType: DocumentType, document: number,
 };
 
 // Iniciar sesión
-export const loginUser = async (document: number, password: string) => {
+export const loginUser = async (documentType: DocumentType, document: number, password: string) => {
   try {
-    console.log("Intentando iniciar sesión con:", { document, password });
+    console.log("Intentando iniciar sesión con:", { documentType, document, password });
 
     const response = await fetch(`${API_URL}/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ document, password }),
+      body: JSON.stringify({ documentType, document, password }),
     });
 
     if (!response.ok) {

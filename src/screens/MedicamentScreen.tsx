@@ -7,6 +7,7 @@ import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import styles from '../styles/MedicamentStyles';
 import { Image } from 'expo-image';
 import { fetchMedicaments } from '../services/medicamentService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Definición de Props para navegación
 type Props = NativeStackScreenProps<RootStackParamList, 'Medicamentos'>;
@@ -29,7 +30,11 @@ const MedicamentScreen: React.FC<Props> = ({ navigation }) => {
     useEffect(() => {
         const loadData = async () => {
             try {
-                const data = await fetchMedicaments();
+                const tipo = await AsyncStorage.getItem('tipoDocumento');
+                const doc = await AsyncStorage.getItem('documento');
+                if (!tipo || !doc) throw new Error('Faltan datos del paciente');
+
+                const data = await fetchMedicaments(tipo, doc);
                 setMedicamentos(data);
             } catch (error) {
                 Alert.alert('Error', 'No se pudo cargar la información de los medicamentos');
@@ -69,18 +74,7 @@ const MedicamentScreen: React.FC<Props> = ({ navigation }) => {
                                 {item.estado}
                             </Text>
                             <View style={styles.buttonContainer}>
-                                <TouchableOpacity style={styles.actionButton}>
-                                    <FontAwesome5 name="file-download" size={16} color={colors.white} />
-                                    <Text style={styles.buttonText}>Descargar</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity style={styles.actionButton}>
-                                    <FontAwesome5 name="redo" size={16} color={colors.white} />
-                                    <Text style={styles.buttonText}>Renovar</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity style={styles.actionButton}>
-                                    <FontAwesome5 name="file-medical" size={16} color={colors.white} />
-                                    <Text style={styles.buttonText}>Pedir</Text>
-                                </TouchableOpacity>
+
                             </View>
                         </View>
                     )}

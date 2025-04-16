@@ -26,6 +26,7 @@ type Paciente = {
   correo: string;
   eps: string;
   iat: number;
+  tipo_documento_abreviado: string;
 };
 
 const PatientInfoScreen: React.FC<Props> = ({ navigation }) => {
@@ -81,7 +82,7 @@ const PatientInfoScreen: React.FC<Props> = ({ navigation }) => {
       {/* Información del paciente */}
       <View style={styles.infoContainer}>
         <Text style={styles.label}><Text style={styles.bold}>Nombre:</Text> {paciente?.primer_nombre} {paciente?.segundo_nombre} {paciente?.primer_apellido} {paciente?.segundo_apellido}</Text>
-        <Text style={styles.label}><Text style={styles.bold}>Documento:</Text> {paciente?.tipo_documento} {paciente?.documento}</Text>
+        <Text style={styles.label}><Text style={styles.bold}>Documento:</Text> {paciente?.tipo_documento_abreviado} {paciente?.documento}</Text>
         <Text style={styles.label}><Text style={styles.bold}>Código IPS:</Text> {paciente?.codigo_ips}</Text>
         <Text style={styles.label}><Text style={styles.bold}>Sexo:</Text> {paciente?.sexo === "M" ? "Masculino" : "Femenino"}</Text>
         <Text style={styles.label}><Text style={styles.bold}>Fecha de Nacimiento:</Text> {paciente?.fecha_nacimiento}</Text>

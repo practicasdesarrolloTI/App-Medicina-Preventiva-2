@@ -8,6 +8,7 @@ import { MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
 import styles from "../styles/ResultStyles";
 import { fetchResults } from '../services/resultService';
 import Colors from "../themes/colors";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 type Resultado = {
@@ -29,17 +30,22 @@ const ResultScreen = ({ navigation }: any) => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const data = await fetchResults();
+        const tipo = await AsyncStorage.getItem('tipoDocumento');
+        const doc = await AsyncStorage.getItem('documento');
+        if (!tipo || !doc) throw new Error("Faltan datos del paciente");
+  
+        const data = await fetchResults(tipo, doc);
         setResultados(data);
       } catch (error) {
+        console.error("Error al cargar resultados:", error);
         Alert.alert("Error", "No se pudo cargar la información de los resultados");
-      }
-      finally {
+      } finally {
         setLoading(false);
       }
     };
     loadData();
   }, []);
+
   return (
     <View style={styles.container}>
       {/* Botón para regresar */}

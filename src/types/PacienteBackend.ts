@@ -1,5 +1,5 @@
 export type PacienteBackend = {
-    tipo_documento: string;
+    tipo_documento: string | number;
     documento: string;
     primer_nombre: string;
     segundo_nombre?: string;
@@ -12,4 +12,5 @@ export type PacienteBackend = {
     correo: string;
     codigo_ips: number;
     eps: string;
+    tipo_documento_abreviado: string;
   };

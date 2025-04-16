@@ -5,38 +5,52 @@ import { RootStackParamList } from '../navigation/AppNavigation';
 import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import styles from '../styles/ProgramStyles';
 import { fetchPrograms } from '../services/programService';
-import Colors from '../themes/colors';
 import { ActivityIndicator } from 'react-native-paper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Definición de Props para navegación
 type Props = NativeStackScreenProps<RootStackParamList, 'TusProgramas'>;
 
-type Programa = {
-  id: string;
-  fechaInscripcion: string;
-  nombre: string;
-  medico: string;
-  fechaProximaCita: string;
-  estado: 'Pendiente' | 'Cumplida' | 'Cancelada';
-};
+// type Programa = {
+//   id: string;
+//   fechaInscripcion: string;
+//   nombre: string;
+//   medico: string;
+//   fechaProximaCita: string;
+//   estado: 'Pendiente' | 'Cumplida' | 'Cancelada';
+// };
 
 const ProgramScreen: React.FC<Props> = ({ navigation }) => {
-  const [programas, setProgramas] = useState<Programa[]>([]);
-  const [loading, setLoading] = useState(true); // Estado de carga
+  const [programas, setProgramas] = useState<{ id: string; fecha_inscripcion: string; programa: string; medico: string; especialidad: string; }[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadData = async () => {
+    const loadPrograms = async () => {
       try {
-        const data = await fetchPrograms();
-        setProgramas(data);
-      } catch (error) {
-        Alert.alert("Error", "No se pudo cargar la información de los programas");
-      }
-      finally {
+        const tipo = await AsyncStorage.getItem('tipoDocumento');
+        const doc = await AsyncStorage.getItem('documento');
+        if (!tipo || !doc) throw new Error('Datos incompletos');
+
+        const data = await fetchPrograms(tipo, doc);
+
+        const formateados = data.map((item: any, index: number) => ({
+          id: index.toString(),
+          fecha_inscripcion: item.fecha_cita?.split(' ')[0] ?? '',
+          programa: item.especialidad_cita ?? '',
+          medico: item.nombre_medico ?? '',
+          especialidad: item.Especialidad ?? '',
+        }));
+
+        setProgramas(formateados);
+      } catch (err) {
+        console.error(err);
+        Alert.alert('Error', 'No se pudieron cargar los programas');
+      } finally {
         setLoading(false);
       }
     };
-    loadData();
+
+    loadPrograms();
   }, []);
 
   return (
@@ -52,28 +66,30 @@ const ProgramScreen: React.FC<Props> = ({ navigation }) => {
       <Text style={styles.title}>Tus Programas</Text>
       {/* Indicador de carga */}
       {loading ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={Colors.primary} />
-          <Text style={styles.loadingText}>Cargando información de sus Programas...</Text>
-        </View>
-      ) : programas ? (
+        <ActivityIndicator size="large" color="#80006A" />
+      ) : programas.length > 0 ? (
         <FlatList
           data={programas}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View style={styles.card}>
-              <Text style={styles.text}><MaterialIcons name="event" size={16} /> {item.fechaInscripcion}</Text>
-              <Text style={styles.text}><FontAwesome5 name="clipboard-list" size={16} /> {item.nombre}</Text>
-              <Text style={styles.text}><FontAwesome5 name="user-md" size={16} /> {item.medico}</Text>
-              <Text style={styles.text}><MaterialIcons name="date-range" size={16} /> {item.fechaProximaCita}</Text>
-              <Text style={[styles.status, item.estado === 'Pendiente' ? styles.pending : item.estado === 'Cancelada' ? styles.cancelled : styles.completed]}>
-                {item.estado}
+              <Text style={styles.text}>
+                <MaterialIcons name="event" size={16} /> Fecha inscripción: {item.fecha_inscripcion}
+              </Text>
+              <Text style={styles.text}>
+                <MaterialIcons name="assignment" size={16} /> Programa: {item.programa}
+              </Text>
+              <Text style={styles.text}>
+                <MaterialIcons name="person" size={16} /> Médico: {item.medico}
+              </Text>
+              <Text style={styles.text}>
+                <MaterialIcons name="medical-services" size={16} /> Especialidad: {item.especialidad}
               </Text>
             </View>
           )}
         />
       ) : (
-        <Text style={styles.errorText}>No se pudo cargar la información de sus programas</Text>
+        <Text style={styles.empty}>No hay programas registrados.</Text>
       )}
     </View>
   );
