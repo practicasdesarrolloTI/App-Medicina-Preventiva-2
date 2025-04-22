@@ -7,6 +7,30 @@ export const framinghamSurvey = {
   requiereSexo: true,
   preguntas: [
     {
+      pregunta: "Edad",
+      omitida: false,
+      opciones: [
+        {texto: "Entre 30-34 años", valor: -1, sexo: "Masculino"},
+        { texto: "Entre 35-39 años", valor: 0, sexo: "Masculino"},
+        { texto: "Entre 40-44 años", valor: 1, sexo: "Masculino"},
+        { texto: "Entre Entre 45-49 años", valor: 2, sexo: "Masculino"},
+        { texto: "Entre 50-54 años", valor: 3, sexo: "Masculino"},
+        { texto: "Entre 55-59 años", valor: 4, sexo: "Masculino"},
+        { texto: "Entre 60-64 años", valor: 5, sexo: "Masculino"},
+        { texto: "Entre 65-69 años", valor: 6, sexo: "Masculino"},
+        { texto: "Entre 70-74 años", valor: 7, sexo: "Masculino"},
+        { texto: "Entre 30-34 años", valor: -9, sexo: "Femenino"},
+        { texto: "Entre 35-39 años", valor: -4, sexo: "Femenino"},
+        { texto: "Entre 40-44 años", valor: 0, sexo: "Femenino"},
+        { texto: "Entre Entre 45-49 años", valor: 3, sexo: "Femenino"},
+        { texto: "Entre 50-54 años", valor: 6, sexo: "Femenino"},
+        { texto: "Entre 55-59 años", valor: 7, sexo: "Femenino"},
+        { texto: "Entre 60-64 años", valor: 8, sexo: "Femenino"},
+        { texto: "Entre 65-69 años", valor: 8, sexo: "Femenino"},
+        { texto: "Entre 70-74 años", valor: 8, sexo: "Femenino"},
+      ]
+    },
+    {
       pregunta: '¿Tiene diabetes?',
       omitida: false,
       opciones: [
@@ -26,93 +50,52 @@ export const framinghamSurvey = {
     {
       pregunta: '¿Cuál es su colesterol total (mg/dL)?',
       omitida: false,
-      opciones: [],
+      opciones: [
+        { texto: 'Menor a 160', valor: -3, sexo: "Masculino"},
+        { texto: 'Entre 160-199', valor: 0, sexo: "Masculino"},
+        { texto: 'Entre 200-239', valor: 1, sexo: "Masculino"},
+        { texto: 'Entre 240-279', valor: 2, sexo: "Masculino"},
+        { texto: 'Mayor a 280', valor: 3, sexo: "Masculino"},
+        { texto: 'Menor a 160', valor: -2, sexo: "Femenino"},
+        { texto: 'Entre 160-199', valor: 0, sexo: "Femenino"},
+        { texto: 'Entre 200-239', valor: 1, sexo: "Femenino"},
+        { texto: 'Entre 240-279', valor: 1, sexo: "Femenino"},
+        { texto: 'Mayor a 280', valor: 3, sexo: "Femenino"},
+      ],
     },
     {
-      pregunta: '¿Cuál es su nivel de HDL (colesterol bueno)?',
+      pregunta: '¿Cuál es su nivel de HDL?',
       omitida: false,
-      opciones: [],
+      opciones: [
+        { texto: 'Menor a 35', valor: 2, sexo: "Masculino"},
+        { texto: 'Entre 35-44', valor: 1, sexo: "Masculino"},
+        { texto: 'Entre 45-49', valor: 0, sexo: "Masculino"},
+        { texto: 'Entre 50-59', valor: 0, sexo: "Masculino"},
+        { texto: 'Mayor a 60', valor: -2, sexo: "Masculino"},
+        { texto: 'Menor a 35', valor: 5, sexo: "Femenino"},
+        { texto: 'Entre 35-44', valor: 2, sexo: "Femenino"},
+        { texto: 'Entre 45-49', valor: 1, sexo: "Femenino"},
+        { texto: 'Entre 50-59', valor: 0, sexo: "Femenino"},
+        { texto: 'Mayor a 60', valor: -3, sexo: "Femenino"},
+      ],
     },
     {
       pregunta: '¿Cuál es su presión arterial sistólica (mmHg)?',
       omitida: false,
-      opciones: [],
+      opciones: [
+        { texto: 'Menor a 120', valor: 0, sexo: "Masculino"},
+        { texto: 'Entre 120-129', valor: 0, sexo: "Masculino"},
+        { texto: 'Entre 130-139', valor: 1, sexo: "Masculino"},
+        { texto: 'Entre 140-159', valor: 2, sexo: "Masculino"},
+        { texto: 'Mayor a 160', valor: 3, sexo: "Masculino"},
+        { texto: 'Menor a 120', valor: -3, sexo: "Femenino"},
+        { texto: 'Entre 120-129', valor: 0, sexo: "Femenino"},
+        { texto: 'Entre 130-139', valor: 0, sexo: "Femenino"},
+        { texto: 'Entre 140-159', valor: 2, sexo: "Femenino"},
+        { texto: 'Mayor a 160', valor: 3, sexo: "Femenino"},
+      ],
     },
   ],
-  calcularPuntaje: (respuestas: string[], edad: number, sexo: string) => {
-    const sexoL = sexo.toLowerCase();
-    const isMale = sexoL === 'masculino';
-
-    let puntaje = 0;
-
-    // Edad
-    if (edad >= 30 && edad <= 34) puntaje += isMale ? -1 : -9;
-    else if (edad <= 39) puntaje += isMale ? 0 : -4;
-    else if (edad <= 44) puntaje += isMale ? 1 : 0;
-    else if (edad <= 49) puntaje += isMale ? 2 : 3;
-    else if (edad <= 54) puntaje += isMale ? 3 : 6;
-    else if (edad <= 59) puntaje += isMale ? 4 : 7;
-    else if (edad <= 64) puntaje += isMale ? 5 : 8;
-    else if (edad <= 69) puntaje += isMale ? 6 : 8;
-    else if (edad <= 74) puntaje +=  isMale ? 7 : 8;
-    else puntaje += 0;
-    
-
-    const diabetes = respuestas[0];
-    puntaje += diabetes ? (isMale ? 2 : 4) : 0;
-
-    const fumador = respuestas[1];
-    puntaje += fumador ? 2 : 0;
-
-    // Colesterol total (respuesta[2])
-    const colesterol = parseFloat(respuestas[2]);
-    if (!isNaN(colesterol)) {
-      if (colesterol < 160) puntaje += isMale ? -3 : -2;
-      else if (colesterol < 200) puntaje += 0;
-      else if (colesterol < 240) puntaje += 1;
-      else if (colesterol < 280) puntaje += isMale ? 2 : 1;
-      else puntaje += 3;
-    }
-
-    const hdl = parseFloat(respuestas[3]);
-    if (!isNaN(hdl)) {
-      if (hdl < 35) puntaje += isMale ? 2 : 5;
-      else if (hdl <= 44) puntaje += isMale ? 1 : 2;
-      else if (hdl <= 49) puntaje += isMale ? 0 : 1;
-      else if (hdl <= 59) puntaje += isMale ? 0 : 0;
-      else puntaje += isMale ? -2 : -3;
-    }
-
-    // Presión Arterial (respuesta[4] y [5])
-    const sistolica = parseFloat(respuestas[4]);
-    const diastolica = parseFloat(respuestas[5]);
-
-    const calcularPresionPuntaje = () => {
-      const sist = isNaN(sistolica) ? 0 : sistolica;
-      const diast = isNaN(diastolica) ? 0 : diastolica;
-      const valor = Math.max(sist, diast);
-    
-      if (sexo.toLowerCase() === "masculino") {
-        if (valor < 120) return 0;
-        if (valor <= 129) return 0;
-        if (valor <= 139) return 1;
-        if (valor <= 159) return 2;
-        return 3;
-      } else if (sexo.toLowerCase() === "femenino") {
-        if (valor < 120) return 3;
-        if (valor <= 129) return 2;
-        if (valor <= 139) return 1;
-        if (valor <= 159) return 0;
-        return 0;
-      }
-    
-      return 0; // En caso de datos incompletos o sexo no definido
-    };    
-
-    puntaje += calcularPresionPuntaje();
-
-    return puntaje;
-  },
 
   recomendaciones: [
     { min: -2, max: -1, texto: 'Riesgo bajo (1-2%)', sexo: null },

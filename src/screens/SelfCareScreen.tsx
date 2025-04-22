@@ -25,6 +25,7 @@ dayjs.extend(duration);
 import SurveyCard from "../components/SurveyCard";
 import { ActivityIndicator } from "react-native-paper";
 import { getRemainingTime } from "../utils/getRemainingTimeUtils";
+import { getPatientIndicators } from "../services/SurveyService"
 
 
 type ResultadoEncuesta = {
@@ -57,6 +58,7 @@ type Paciente = {
 };
 const SelfCareScreen: React.FC = () => {
   const [paciente, setPaciente] = useState<Paciente | null>(null);
+  const [indicadores, setIndicadores] = useState<any>(null);
   const navigation = useNavigation<NavigationProp>();
   const [resultados, setResultados] = useState<ResultadoEncuesta[]>([]);
   const [encuestas, setEncuestas] = useState<Survey[]>([
@@ -85,18 +87,18 @@ const SelfCareScreen: React.FC = () => {
   const loadPatient = async () => {
     try {
       const storedDoc = await AsyncStorage.getItem('documento');
-      if (!storedDoc) {
-        Alert.alert("Error", "No se encontró el documento del paciente.");
-        return;
-      }
-
+      const storedTipo = await AsyncStorage.getItem('tipoDocumento');
+      if (!storedDoc || !storedTipo) return;
+  
       const data = await getPatientByDocument(storedDoc);
       setPaciente(data as unknown as Paciente);
+  
+      const indicadoresData = await getPatientIndicators(storedTipo, storedDoc);
+      setIndicadores(indicadoresData);
     } catch (error) {
       Alert.alert("Error", "Error al obtener información del paciente.");
     }
   };
-
 
   useEffect(() => {
     loadPatient();
@@ -164,6 +166,7 @@ const SelfCareScreen: React.FC = () => {
       edad,
       sexo,
       survey,
+      indicadores,
     });
   };
 

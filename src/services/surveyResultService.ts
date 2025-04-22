@@ -1,7 +1,7 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const API_URL = "http://10.20.15.237:5000/api/Surveyresults"; // 🔁 Asegúrate de reemplazar por tu URL real
+const API_URL = "http://10.20.15.237:5000/api/Surveyresults"; 
 
 type SurveyResultResponse = {
   success?: boolean;

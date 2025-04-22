@@ -37,12 +37,15 @@ export type RootStackParamList = {
     puntaje: number;
     edad: number;
     sexo: string;
+    indicadores: any;
+    imc: number;
     survey: {
       id: string;
       nombre: string;
       descripcion: string;
       requiereEdad: boolean;
       requiereSexo: boolean;
+
       preguntas: {
         omitida: boolean;
         pregunta: string;
@@ -55,13 +58,12 @@ export type RootStackParamList = {
         texto: string;
         sexo: string | null;
       }[];
-      calcularPuntaje?: (responses: any[], edad: number, sexo: string) => number;
     };
   };
   SurveyScreen: {
     surveyId: string;
     preguntas: {
-      omitida: boolean;
+      omitida: boolean | number | string | any;
       pregunta: string;
       opciones: { texto: string; valor: number; sexo: string }[];
       recomendaciones?: string;
@@ -69,7 +71,7 @@ export type RootStackParamList = {
     edad: number;
     sexo: string;
     survey: {
-      calcularPuntaje?: any;
+
       id: string;
       nombre: string;
       descripcion: string;
@@ -78,12 +80,12 @@ export type RootStackParamList = {
         pregunta: string;
         opciones: { texto: string; valor: number; sexo: string }[];
         recomendaciones?: string;
-        calcularPuntaje?: any;
       }[];
       requiereEdad: boolean;
       requiereSexo: boolean;
       requiredIMC?: boolean;
     };
+    indicadores: any;
   };
 };
 

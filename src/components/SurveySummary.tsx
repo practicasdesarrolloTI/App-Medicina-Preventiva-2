@@ -36,18 +36,9 @@ type Respuesta =
   };
 
 const SurveySummary: React.FC<Props> = ({ route, navigation }) => {
-  const { surveyId, puntaje, edad, sexo, survey } = route.params;
+  const { surveyId, puntaje, edad, sexo, survey, indicadores, imc } = route.params;
   const { responses } = route.params as unknown as { responses: Respuesta[] };
    const [paciente, setPaciente] = useState<Paciente | null>(null);
-
-  const estaturaStr = responses[0] as string;
-  const pesoStr = responses[1] as string;
-
-  const estatura = parseFloat(estaturaStr);
-  const peso = parseFloat(pesoStr);
-
-  const imc = peso && estatura ? peso / (estatura * estatura) : NaN;
-
 
 
   const getRecomendacion = () => {
@@ -81,7 +72,7 @@ const SurveySummary: React.FC<Props> = ({ route, navigation }) => {
 
       const result = await submitSurveyResult({
         surveyId,
-        patientTypeId: storedDoc.tipo_documento ?? '',
+        patientTypeId: String(storedDoc.tipo_documento ?? ''),
         patientId: storedDoc.documento,
         patientName: `${storedDoc.primer_nombre} ${storedDoc.segundo_nombre || ''} ${storedDoc.primer_apellido} ${storedDoc.segundo_apellido || ''}`,
         surveyName: survey.nombre,

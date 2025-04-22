@@ -6,58 +6,25 @@ export const findriscSurvey = {
   requiereSexo: true,
   requireIMC: true,
 
-  calcularPuntaje: (respuestas: any[], edad: number, sexo: string) => {
-    let puntaje = 0;
-  
-    // Edad (según FINDRISC)
-    if (edad < 45) {
-      puntaje += 0;
-    } else if (edad >= 45 && edad <= 54) {
-      puntaje += 2;
-    } else if (edad >= 55) {
-      puntaje += 3;
-    }
-  
-    // ✅ IMC (índice de masa corporal)
-    const estatura = parseFloat(respuestas[0]);
-    const peso = parseFloat(respuestas[1]);
-    const imc = peso && estatura ? peso / (estatura * estatura) : 0;
-  
-    if (imc >= 25 && imc <= 30) {
-      puntaje += 1;
-    } else if (imc > 30) {
-      puntaje += 3;
-    }
-  
-    // Circunferencia abdominal (pregunta con opciones)
-    puntaje += Number(respuestas[2] || 0);
-  
-    //  Actividad física
-    puntaje += Number(respuestas[3] || 0);
-  
-    //  Consumo de frutas y vegetales
-    puntaje += Number(respuestas[4] || 0);
-  
-    //  Medicación para presión alta
-    puntaje += Number(respuestas[5] || 0);
-  
-    // Nivel alto de glucosa
-    puntaje += Number(respuestas[6] || 0);
-  
-    //  Familiares con diabetes
-    puntaje += Number(respuestas[7] || 0);
-  
-    return puntaje;
-  },  
-
   preguntas: [
     {
-      pregunta: "¿Tiene antecedentes familiares de diabetes?",
+      pregunta: "Edad",
       omitida: false,
       opciones: [
-        { texto: "No", valor: 0, sexo: null },
-        { texto: "Sí: abuelo, tío o primo", valor: 3, sexo: null },
-        { texto: "Sí: padre, madre, hermano", valor: 5, sexo: null },
+        {texto: "Menos de 45 años", valor: 0, sexo: null},
+        {texto: "Entre 45-54 años", valor: 2, sexo: null},
+        {texto: "Entre 55-64 años", valor: 3, sexo: null},
+        {texto: "Mas de 64 años", valor: 4, sexo: null},
+      ],
+    },
+    {
+      pregunta: "IMC (kg/m2)",
+      requiredIMC: true,
+      omitida: false,
+      opciones: [
+        {texto: "Menos de 25 kg/m2", valor: 0, sexo: null},
+        {texto: "Entre 25-30 kg/m2", valor: 1, sexo: null},
+        {texto: "Mas de 30 kg/m2", valor: 3, sexo: null},
       ],
     },
     {
@@ -70,6 +37,15 @@ export const findriscSurvey = {
         { texto: "< 80cm", valor: 0, sexo: "Femenino" },
         { texto: "80-88cm", valor: 3, sexo: "Femenino" },
         { texto: ">88cm", valor: 4, sexo: "Femenino" },
+      ],
+    },
+    {
+      pregunta: "¿Tiene antecedentes familiares de diabetes?",
+      omitida: false,
+      opciones: [
+        { texto: "No", valor: 0, sexo: null },
+        { texto: "Sí: abuelo, tío o primo", valor: 3, sexo: null },
+        { texto: "Sí: padre, madre, hermano", valor: 5, sexo: null },
       ],
     },
     {
@@ -86,7 +62,6 @@ export const findriscSurvey = {
       opciones: [
         { texto: "Diario", valor: 0, sexo: null },
         { texto: "Ocasional", valor: 1, sexo: null },
-        { texto: "Raramente o nunca", valor: 2, sexo: null },
       ],
     },
     {

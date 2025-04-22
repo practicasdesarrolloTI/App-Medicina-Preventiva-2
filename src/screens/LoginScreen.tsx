@@ -28,15 +28,15 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
 
   const handleLogin = async () => {
 
-    if (isBlocked) {
-      Toast.show({
-        type: 'error',
-        text1: 'Acceso bloqueado',
-        text2: 'Has superado el límite de intentos. Intenta más tarde.',
-      });
-      setVisible(true);
-      return;
-    }
+    // if (isBlocked) {
+    //   Toast.show({
+    //     type: 'error',
+    //     text1: 'Acceso bloqueado',
+    //     text2: 'Has superado el límite de intentos. Intenta más tarde.',
+    //   });
+    //   setVisible(true);
+    //   return;
+    // }
 
     if (!documentType || !document || !password) {
       Toast.show({
@@ -49,15 +49,15 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
     }
 
 
-    if (isBlocked) {
-      Toast.show({
-        type: 'error',
-        text1: 'Acceso bloqueado',
-        text2: 'Has superado el límite de intentos. Intenta más tarde.',
-      });
-      setVisible(true);
-      return;
-    }
+    // if (isBlocked) {
+    //   Toast.show({
+    //     type: 'error',
+    //     text1: 'Acceso bloqueado',
+    //     text2: 'Has superado el límite de intentos. Intenta más tarde.',
+    //   });
+    //   setVisible(true);
+    //   return;
+    // }
 
     
     // const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{4,12}$/;
@@ -85,18 +85,24 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
     await AsyncStorage.setItem('tipoDocumento', String(documentType));
 
     if (!result.success) {
-      setFailedAttempts(prev => {
-        const newCount = prev + 1;
-        if (newCount >= 5) {
-          setIsBlocked(true);
-          Toast.show({
-            type: 'error',
-            text1: 'Acceso bloqueado',
-            text2: 'Has superado el límite de intentos.',
-          });
-        }
-        return newCount;
+      // setFailedAttempts(prev => {
+      //   const newCount = prev + 1;
+      //   if (newCount >= 5) {
+      //     setIsBlocked(true);
+      //     Toast.show({
+      //       type: 'error',
+      //       text1: 'Acceso bloqueado',
+      //       text2: 'Has superado el límite de intentos.',
+      //     });
+      //   }
+      //   return newCount;
+      // });
+      Toast.show({
+        type: 'error',
+        text1: 'Error de Inicio de Sesión',
+        text2: 'Usuario o contraseña incorrectos.',
       });
+      setVisible(true);
     } else {
       Toast.show({
         type: 'success',
