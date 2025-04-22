@@ -15,7 +15,9 @@ export const fetchMedicaments = async (tipoDocumento: string, numeroDocumento: s
       nombre: `${item.nombre_medicamento} - ${item.prescripcion_medicamento}`,
       fechaOrden: item.fecha_vigencia?.split(' ')[0] ?? '',
       medico: item.medico ?? 'Sin médico',
-      estado: item.estado ?? 'Pendiente'
+      estado: item.estado ?? 'Pendiente',
+      presentacion: item.prescripcion_medicamento,
+      cantidad: item.Cantidad,
     }));
   } catch (error) {
     console.error('Error al obtener medicamentos:', error);

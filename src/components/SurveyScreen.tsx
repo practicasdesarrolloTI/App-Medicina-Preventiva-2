@@ -43,6 +43,8 @@ const SurveyScreen: React.FC<SurveyScreenProps> = ({ route }) => {
 
   const imc = peso && estatura ? peso / (estatura * estatura) : NaN;
 
+  console.log("Yaaaaa", indicadores)
+
 
 
   // 🔍 Filtrar preguntas omitidas

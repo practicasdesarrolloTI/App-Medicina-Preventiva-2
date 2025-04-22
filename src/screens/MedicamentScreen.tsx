@@ -8,11 +8,32 @@ import styles from '../styles/MedicamentStyles';
 import { Image } from 'expo-image';
 import { fetchMedicaments } from '../services/medicamentService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+// import { Button } from 'react-native';
+// import { downloadMedicamentsOrder } from '../services/pdfServices';
+import { agruparMedicamentosPorFecha, generarPDFMedicamentos } from '../services/pdfMedsService';
+import { getPatientByDocument } from "../services/patientService";
+import { calcularEdad } from '../utils/dateUtils';
 
 // Definición de Props para navegación
 type Props = NativeStackScreenProps<RootStackParamList, 'Medicamentos'>;
 
-
+type Paciente = {
+    primer_nombre: string;
+    segundo_nombre?: string;
+    primer_apellido: string;
+    segundo_apellido?: string;
+    tipo_documento: string;
+    documento: string;
+    fecha_nacimiento: string;
+    codigo_ips: number;
+    sexo: string;
+    celular: number;
+    telefono: number;
+    correo: string;
+    eps: string;
+    iat: number;
+    tipo_documento_abreviado: string;
+};
 
 type Medicamento = {
     id: string;
@@ -24,27 +45,89 @@ type Medicamento = {
 
 const MedicamentScreen: React.FC<Props> = ({ navigation }) => {
     const [medicamentos, setMedicamentos] = useState<Medicamento[]>([]);
+    const [paciente, setPaciente] = useState<Paciente | null>(null);
 
     const [loading, setLoading] = useState(true); // Estado de carga
 
-    useEffect(() => {
-        const loadData = async () => {
-            try {
-                const tipo = await AsyncStorage.getItem('tipoDocumento');
-                const doc = await AsyncStorage.getItem('documento');
-                if (!tipo || !doc) throw new Error('Faltan datos del paciente');
+    const loadData = async () => {
+        try {
+            const tipo = await AsyncStorage.getItem('tipoDocumento');
+            const doc = await AsyncStorage.getItem('documento');
+            if (!tipo || !doc) throw new Error('Faltan datos del paciente');
 
-                const data = await fetchMedicaments(tipo, doc);
-                setMedicamentos(data);
-            } catch (error) {
-                Alert.alert('Error', 'No se pudo cargar la información de los medicamentos');
+            const data = await fetchMedicaments(tipo, doc);
+            setMedicamentos(data);
+        } catch (error) {
+            Alert.alert('Error', 'No se pudo cargar la información de los medicamentos');
+        }
+        finally {
+            setLoading(false);
+        }
+    };
+
+    const loadPatient = async () => {
+        try {
+            const storedDoc = await AsyncStorage.getItem('documento');
+            if (!storedDoc) {
+                Alert.alert("Error", "No se encontró el documento del paciente.");
+                return;
             }
-            finally {
-                setLoading(false);
-            }
-        };
+
+            const data = await getPatientByDocument(storedDoc);
+            setPaciente(data as unknown as Paciente);
+        } catch (error) {
+            Alert.alert("Error", "Error al obtener información del paciente.");
+        }
+        finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        loadPatient();
         loadData();
     }, []);
+
+    // const handleDownloadBack = async () => {
+    //     try {
+    //         const tipo = await AsyncStorage.getItem('tipoDocumento');
+    //         const doc = await AsyncStorage.getItem('documento');
+
+    //         if (tipo && doc) {
+    //             await downloadMedicamentsOrder(tipo, doc);
+    //         } else {
+    //             throw new Error('Faltan datos del paciente');
+    //         }
+    //         Alert.alert('Éxito', 'La orden fue descargada y está lista para visualizar o compartir.');
+    //     } catch {
+    //         Alert.alert('Error', 'No se pudo descargar la orden.');
+    //     }
+    // };
+
+    const handleDownload = async () => {
+        try {
+            const tipo = await AsyncStorage.getItem('tipoDocumento');
+            const doc = await AsyncStorage.getItem('documento');
+            const edad = paciente?.fecha_nacimiento ? calcularEdad(paciente.fecha_nacimiento) : 0;
+
+            if (!tipo || !doc) throw new Error('Faltan datos del paciente');
+
+
+            const agrupados = agruparMedicamentosPorFecha(medicamentos);
+
+
+            const fechasOrden = Object.keys(agrupados);
+            if (fechasOrden.length === 0) return Alert.alert('Sin medicamentos recientes', 'No hay medicamentos en los últimos 3 meses.');
+
+            // Seleccionar la primera fecha (o podrías mostrar un Picker)
+            const fechaSeleccionada = fechasOrden[0];
+            await generarPDFMedicamentos({ nombre: paciente?.primer_nombre, tipoDocumento: paciente?.tipo_documento_abreviado, Documento: paciente?.documento, edad: edad }, agrupados[fechaSeleccionada], fechaSeleccionada);
+            Alert.alert('Éxito', 'La orden fue generada y está lista para visualizar o compartir.');
+        } catch (error) {
+            console.error(error);
+            Alert.alert('Error', 'No se pudo generar la orden.');
+        }
+    };
 
     return (
         <View style={styles.container}>
@@ -74,9 +157,13 @@ const MedicamentScreen: React.FC<Props> = ({ navigation }) => {
                                 {item.estado}
                             </Text>
                             <View style={styles.buttonContainer}>
-
                             </View>
+                            {/* <Button title="Descargar Orden de Medicamentos" onPress={handleDownloadBack} /> */}
+                            <TouchableOpacity style={styles.webButton} onPress={(handleDownload)}>
+                                <Text style={styles.webButtonText}>Descargar Orden</Text>
+                            </TouchableOpacity>
                         </View>
+
                     )}
                 />
             ) : (

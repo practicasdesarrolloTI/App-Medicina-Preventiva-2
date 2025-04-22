@@ -33,6 +33,8 @@ const PatientInfoScreen: React.FC<Props> = ({ navigation }) => {
   const [paciente, setPaciente] = useState<Paciente | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const edad = paciente?.fecha_nacimiento ? calcularEdad(paciente.fecha_nacimiento) : 0;
+
   useEffect(() => {
     const loadPatient = async () => {
       try {
